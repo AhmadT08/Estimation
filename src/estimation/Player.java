@@ -34,7 +34,7 @@ public class Player {
         return c;
     }
 
-    public void setC(Call c) {
+    public void setCall(Call c) {
         this.c = c;
     }
 

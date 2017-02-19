@@ -15,7 +15,7 @@ import java.util.Arrays;
 public class Call {
 
     private int tricks;
-    private String suit;
+    private String suit = "";
     private Boolean dashCall;
     private static ArrayList<String> suitRanking = new ArrayList<>(Arrays.asList("Clubs", "Diamonds", "Hearts", "Spades", "Suns"));
 
@@ -26,6 +26,36 @@ public class Call {
             this.dashCall = false;
         }
         this.dashCall = dashcall;
+    }
+    
+    public Call(int tricks){
+        this.tricks = tricks;
+        dashCall = false;
+    }
+
+    public Call(Boolean dash) {
+        this.tricks = 0;
+        dashCall = true;
+    }
+
+    public int getTricks() {
+        return tricks;
+    }
+
+    public void setTricks(int tricks) {
+        this.tricks = tricks;
+    }
+
+    public String getSuit() {
+        return suit;
+    }
+
+    public void setSuit(String suit) {
+        this.suit = suit;
+    }
+
+    public Boolean isDashCall() {
+        return dashCall;
     }
 
     public String compareSuits(String x, String y) //returns the larger of the two suits
