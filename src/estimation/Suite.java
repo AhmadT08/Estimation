@@ -6,5 +6,5 @@
 package estimation;
 
 public class Suite {
-    
+
 }

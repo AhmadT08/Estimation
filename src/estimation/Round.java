@@ -16,7 +16,7 @@ import java.util.Collections;
 public class Round {
 
     private Session session;
-    private Call c;
+    private Call call;
     private Boolean times2 = false;
     private Boolean times4 = false;
     private Boolean times6 = false;
@@ -50,12 +50,12 @@ public class Round {
         initiateBidding(dealer);
     }
 
-    public Call getC() {
-        return c;
+    public Call getCall() {
+        return call;
     }
 
-    public void setC(Call c) {
-        this.c = c;
+    public void setCall(Call c) {
+        this.call = c;
     }
 
     public int getMultiplier() {
@@ -164,6 +164,7 @@ public class Round {
             for (int j = 13 * i; j < 13 * (i + 1); j++) {
                 players.get(i).addCardToHand(cards.get(j));
             }
+            players.get(i).sortHand();
         }
     }
 
@@ -173,11 +174,11 @@ public class Round {
 
         while (i < 4) {
             if (dashCounter == 2) { //only two dash calls are allowed per round
-                setMultiplier(getMultiplier()+2); //when two players bid dash call in one round, 
+                setMultiplier(getMultiplier() + 2); //when two players bid dash call in one round, 
                 break;                            //the score multiplier increases by 2
             } else {
                 if (players.get(dealer).dashCall()) {
-                    dashCounter++; 
+                    dashCounter++;
                 }
                 if (dealer == 3) {
                     dealer = 0; //move index to next player
@@ -193,7 +194,7 @@ public class Round {
         players.get(dealer).translate();
         dashCall(dealer);
         players.get(dealer).openBidding();
-
+        
     }
 
 }

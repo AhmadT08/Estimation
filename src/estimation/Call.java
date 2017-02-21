@@ -27,8 +27,8 @@ public class Call {
         }
         this.dashCall = dashcall;
     }
-    
-    public Call(int tricks){
+
+    public Call(int tricks) {
         this.tricks = tricks;
         dashCall = false;
     }

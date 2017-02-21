@@ -19,7 +19,7 @@ public class Estimation {
     public static void Translate(ArrayList<Integer> list) {
         Collections.sort(list);
         Collections.reverse(list);
-        
+
         for (int j = 0; j < 13; j++) {
             int card = list.get(j);
             if ((card - 1) / 13 == 0) {
@@ -77,8 +77,8 @@ public class Estimation {
 
         }
     }
-    
-    public static ArrayList Deal(){
+
+    public static ArrayList Deal() {
         ArrayList<Integer> cards = new ArrayList(52);
         for (int i = 1; i < 53; i++) {
             cards.add(i);
@@ -104,11 +104,9 @@ public class Estimation {
         Computer c1 = new Computer("Computer1");
         Computer c2 = new Computer("Computer2");
         Computer c3 = new Computer("Computer3");
-        
-        Session s1 = new Session(u1,c1,c2,c3,"Easy");
-        
-        
-        
+
+        Session s1 = new Session(u1, c1, c2, c3, "Easy");
+
     }
 
 }
