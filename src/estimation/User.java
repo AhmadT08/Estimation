@@ -14,11 +14,14 @@ import java.util.Scanner;
 public class User extends Player {
 
     public User(String n) {
+        super();
         name = n;
     }
 
     public Boolean dashCall() {
         Boolean b = false;
+        
+        translate();
 
         System.out.println("Dash call? Y/N");
 

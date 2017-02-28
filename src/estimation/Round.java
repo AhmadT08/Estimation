@@ -8,6 +8,8 @@ package estimation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *
@@ -158,12 +160,14 @@ public class Round {
         for (int i = 1; i < 53; i++) {
             cards.add(i);
         }
+
         Collections.shuffle(cards);
 
         for (int i = 0; i < 4; i++) {
             for (int j = 13 * i; j < 13 * (i + 1); j++) {
                 players.get(i).addCardToHand(cards.get(j));
             }
+
             players.get(i).sortHand();
         }
     }
@@ -180,21 +184,127 @@ public class Round {
                 if (players.get(dealer).dashCall()) {
                     dashCounter++;
                 }
+                
                 if (dealer == 3) {
                     dealer = 0; //move index to next player
                 } else {
                     dealer++;
                 }
+                
                 i++;
             }
         }
     }
 
+    public void collectBids(int dealer) {
+        int i = 0;
+
+        while (i < 4) {
+            if (players.get(dealer).getCall().isDashCall()) {
+
+            } else {
+                players.get(dealer).openBidding();
+                
+                if (dealer == 3) {
+                    dealer = 0; //move index to next player
+                } else {
+                    dealer++;
+                }
+                
+                i++;
+            }
+        }
+    }
+
+    public int testDashCall() {
+//        int dealer = 0;
+        int dash = 0;
+        for (int j = 0; j < 4; j++) {
+            if (players.get(j).hasCall()) {
+                System.out.println("\nHAS CALL");
+                translate(players.get(j).getHand());
+                System.out.println("");
+            } else {
+                if (players.get(j).dashCall()) {
+                    System.out.println("\nDASHCALL!!");
+
+                    if (players.get(j).isAvoid()) {
+                        System.out.println("Avoid");
+                    }
+
+                    translate(players.get(j).getHand());
+                    dash++;
+                }
+            }
+        }
+        return dash;
+    }
+
+    public void testHasCall() {
+        for (int j = 0; j < 4; j++) {
+            if (players.get(j).hasCall()) {
+                System.out.println();
+
+                if (players.get(j).isAvoid()) {
+                    System.out.println("Avoid");
+                }
+
+                translate(players.get(j).getHand());
+            }
+        }
+    }
+
     public void initiateBidding(int dealer) {
-        players.get(dealer).translate();
+//        players.get(dealer).translate();
+//        for (int i = 0; i < 2; i++) {
+//            for (int j = 0; j < 4; j++) {
+//                translate(players.get(j).getHand());
+////                System.out.println(players.get(j).getHand());
+//
+//                Set<Integer> set = new HashSet<Integer>(players.get(j).getHand());
+//
+//                if (set.size() < players.get(j).getHand().size()) {
+//                    System.out.println("Duplicates!!!!!!!!!!!!");
+//                }
+//            }
+//        }
+
+//        int dashCounter = 0;
+//        int i = 0;
+//        if (dealer == 0) {
+//            System.out.println();
+//            for (i = 0; i < 200; i++) {
+//                Computer c1 = new Computer("Computer1");
+//                Computer c2 = new Computer("Computer2");
+//                Computer c3 = new Computer("Computer3");
+//                Computer c4 = new Computer("Computer4");
+//                ArrayList<Player> p = new ArrayList(Arrays.asList(c1, c2, c3, c4));
+//                Round r = new Round(multiplier, p, session, 1);
+//                dashCounter += r.testDashCall();
+//            }
+//            System.out.println(dashCounter + " from " + i);
+//        } else {
+//
+//        }
+//        int dashCounter = 0;
+//        int i = 0;
+//        if (dealer == 0) {
+//            System.out.println();
+//            for (i = 0; i < 200; i++) {
+//                Computer c1 = new Computer("Computer1");
+//                Computer c2 = new Computer("Computer2");
+//                Computer c3 = new Computer("Computer3");
+//                Computer c4 = new Computer("Computer4");
+//                ArrayList<Player> p = new ArrayList(Arrays.asList(c1, c2, c3, c4));
+//                Round r = new Round(multiplier, p, session, 1);
+//                r.testHasCall();
+//            }
+//        } else {
+//
+//        }
+//        testDashCall();
         dashCall(dealer);
-        players.get(dealer).openBidding();
-        
+        collectBids(dealer);
     }
 
 }
