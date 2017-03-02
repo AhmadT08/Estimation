@@ -34,6 +34,13 @@ public class Session {
     public void Start() {
         roundNumber = 1;
         r = new Round(1, players, this, dealer);
+        clearPlayerHands();
+    }
+
+    public void RestartRound(int multi) {
+        System.out.println("All players passed, round restarted");
+        clearPlayerHands();
+        r = new Round(multi, players, this, dealer);
     }
 
     public void nextRound() {
@@ -43,7 +50,14 @@ public class Session {
         } else {
             dealer++;
         }
+        clearPlayerHands();
         r = new Round(1, players, this, dealer);
+    }
+
+    public void clearPlayerHands() {
+        for (Player p : players) {
+            p.clearHand();
+        }
     }
 
     public void endSession() {

@@ -25,7 +25,7 @@ public class Player {
 
     public Player() {
         score = 0;
-        c = new Call(0);
+        c = new Call(true);
     }
 
     public String getName() {
@@ -87,7 +87,10 @@ public class Player {
                 hand.remove(i);
             }
         }
-
+    }
+    
+    public void clearHand(){
+        hand = new ArrayList();
     }
 
     public ArrayList<Integer> getHand() {
@@ -164,8 +167,9 @@ public class Player {
         return false;
     }
 
-    public void openBidding() {
-
+    public Call openBidding() {
+        Call c = new Call(true);
+        return c;
     }
 
     public Boolean isAvoid() {

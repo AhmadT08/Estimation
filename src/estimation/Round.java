@@ -184,36 +184,57 @@ public class Round {
                 if (players.get(dealer).dashCall()) {
                     dashCounter++;
                 }
-                
+
                 if (dealer == 3) {
                     dealer = 0; //move index to next player
                 } else {
                     dealer++;
                 }
-                
+
                 i++;
             }
         }
     }
 
-    public void collectBids(int dealer) {
+    public Call collectBids(int dealer) {
         int i = 0;
+        Boolean b = false;
+        int passCounter = 0;
+        Call x = new Call(true);
 
+        ArrayList<Call> calls = new ArrayList();
         while (i < 4) {
             if (players.get(dealer).getCall().isDashCall()) {
-
+                passCounter++;
             } else {
-                players.get(dealer).openBidding();
-                
+                Call c = players.get(dealer).openBidding();
+                calls.add(c);
+
+                if (c.isPassed()) {
+                    passCounter++;
+                }
+
                 if (dealer == 3) {
                     dealer = 0; //move index to next player
                 } else {
                     dealer++;
                 }
-                
+
                 i++;
             }
         }
+
+        if (passCounter == 4) {
+            session.RestartRound(multiplier + 2);
+        } else {
+            for (int j = 0; j < calls.size(); j++) {
+                if (!calls.get(j).isPassed()) {
+                    x = calls.get(j);
+                }
+            }
+        }
+
+        return x;
     }
 
     public int testDashCall() {
@@ -252,6 +273,10 @@ public class Round {
                 translate(players.get(j).getHand());
             }
         }
+    }
+
+    public void secondRoundBids(int dealer) {
+        
     }
 
     public void initiateBidding(int dealer) {
@@ -305,6 +330,7 @@ public class Round {
 //        testDashCall();
         dashCall(dealer);
         collectBids(dealer);
+
     }
 
 }

@@ -20,8 +20,10 @@ public class Computer extends Player {
         name = n;
     }
 
-    public void openBidding() {
-
+    public Call openBidding() {
+        Call c = new Call(true);
+        setCall(c);
+        return c;
     }
 
     public Boolean dashCall() {

@@ -20,7 +20,7 @@ public class User extends Player {
 
     public Boolean dashCall() {
         Boolean b = false;
-        
+
         translate();
 
         System.out.println("Dash call? Y/N");
@@ -44,38 +44,48 @@ public class User extends Player {
                 break;
             case "N":
                 b = false;
-                setCall(new Call(0));
+                setCall(new Call(0, this));
                 break;
             case "n":
                 b = false;
-                setCall(new Call(0));
+                setCall(new Call(0, this));
                 break;
         }
 
         return b;
     }
 
-    public void openBidding() {
-        if (!getCall().isDashCall()) { //a bid can only be made if the player has not called dash call
-            System.out.println("Make a bid of number greater than 3 + suit");
-            Scanner sc = new Scanner(System.in);
+    public Call openBidding() {
+        Call c = new Call(true);
 
-            int number = 0;
+        if (!getCall().isDashCall()) { //a bid can only be made if the player has not called dash call
+            System.out.println("Make a bid of number greater than 3 + suit. Input 'Pass' to pass.");
+            Scanner sc = new Scanner(System.in);
+            String x = sc.nextLine();
+
+            if (x.toLowerCase().equals("pass")) { //allows the user to pass on bidding
+                c = new Call(true);
+            } else {
+                int number = 0;
             while (number < 4 || number > 13) {
                 System.out.println("Please make a bid between 4 and 13");
                 number = sc.nextInt();
             }
 
-            int s = 0;
-            String[] suits = {"Suns", "Spades", "Hearts", "Diamonds", "Clubs"};
-            System.out.println("Choose a suit: \n1) Suns. \n2) Spades. \n3) Hearts. \n4) Diamonds. \n5) Clubs.\n");
-            while (s < 1 || s > 5) {
-                System.out.println("Please choose a number between 1 and 5");
-                s = sc.nextInt();
+                int s = 0;
+                String[] suits = {"Suns", "Spades", "Hearts", "Diamonds", "Clubs"};
+                System.out.println("Choose a suit: \n1) Suns. \n2) Spades. \n3) Hearts. \n4) Diamonds. \n5) Clubs.\n");
+                while (s < 1 || s > 5) {
+                    System.out.println("Please choose a number between 1 and 5");
+
+                    s = sc.nextInt();
+                }
+                c = new Call(number, suits[s - 1], false, this);
+                System.out.println("Your call is " + number + " " + suits[s - 1]);
             }
-
-            System.out.println("Your call is " + number + " " + suits[s - 1]);
         }
-
+        
+        setCall(c);
+        return c;
     }
 }

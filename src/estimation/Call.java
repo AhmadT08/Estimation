@@ -17,25 +17,39 @@ public class Call {
     private int tricks;
     private String suit = "";
     private Boolean dashCall;
+    private Boolean pass;
+    private Player player;
     private static ArrayList<String> suitRanking = new ArrayList<>(Arrays.asList("Clubs", "Diamonds", "Hearts", "Spades", "Suns"));
 
-    public Call(int tricks, String suit, Boolean dashcall) {
+    public Call(int tricks, String suit, Boolean dashcall, Player p) {
         this.tricks = tricks;
         this.suit = suit;
+        pass = false;
         if (tricks > 0) {
             this.dashCall = false;
         }
         this.dashCall = dashcall;
+        player = p;
     }
 
-    public Call(int tricks) {
+    public Call(int tricks, Player p) {
         this.tricks = tricks;
         dashCall = false;
+        pass = false;
+        player = p;
     }
 
-    public Call(Boolean dash) {
+    public Call(Boolean dash, int tricks, Player p) {
         this.tricks = 0;
         dashCall = true;
+        pass = true;
+        player = p;
+    }
+    
+    public Call(Boolean p){
+        tricks = 0;
+        dashCall = false;
+        pass = true;
     }
 
     public int getTricks() {
@@ -58,6 +72,10 @@ public class Call {
         return dashCall;
     }
 
+    public Boolean isPassed(){
+        return pass;
+    }
+    
     public String compareSuits(String x, String y) //returns the larger of the two suits
     {
         String result = "";
