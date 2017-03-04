@@ -18,7 +18,7 @@ public class Call {
     private String suit = "";
     private Boolean dashCall;
     private Boolean pass;
-    private Player player;
+    private Player caller;
     private static ArrayList<String> suitRanking = new ArrayList<>(Arrays.asList("Clubs", "Diamonds", "Hearts", "Spades", "Suns"));
 
     public Call(int tricks, String suit, Boolean dashcall, Player p) {
@@ -29,21 +29,21 @@ public class Call {
             this.dashCall = false;
         }
         this.dashCall = dashcall;
-        player = p;
+        caller = p;
     }
 
     public Call(int tricks, Player p) {
         this.tricks = tricks;
         dashCall = false;
         pass = false;
-        player = p;
+        caller = p;
     }
 
-    public Call(Boolean dash, int tricks, Player p) {
+    public Call(Boolean dash, Player p) {
         this.tricks = 0;
         dashCall = true;
         pass = true;
-        player = p;
+        caller = p;
     }
     
     public Call(Boolean p){
@@ -76,8 +76,13 @@ public class Call {
         return pass;
     }
     
-    public String compareSuits(String x, String y) //returns the larger of the two suits
-    {
+    public Player getCaller(){
+        return caller;
+    }
+    
+    public String returnLargerSuit(String x, String y) {
+        //returns the larger of the two suits
+        
         String result = "";
 
         int x1, y1;
@@ -107,9 +112,11 @@ public class Call {
 
         if (c.tricks > this.tricks) {
             b = false;
-        } else if (c.tricks == this.tricks && c.suit.equals(compareSuits(c.suit, this.suit))) {
+        } else if (c.tricks == this.tricks && c.suit.equals(returnLargerSuit(c.suit, this.suit))) {
             b = false;
-        } else if (c.tricks == this.tricks && this.suit.equals(compareSuits(c.suit, this.suit))) {
+        } else if (c.tricks == this.tricks && this.suit.equals(c.suit)) {
+            b = false;
+        } else if (c.tricks == this.tricks && this.suit.equals(returnLargerSuit(c.suit, this.suit))) {
             b = true;
         } else if (c.tricks < this.tricks) {
             b = true;

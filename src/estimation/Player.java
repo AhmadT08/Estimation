@@ -21,6 +21,8 @@ public class Player {
     private Boolean caller;
     private int position;
     private int tricks;
+    private Round round;
+    private Session session;
     private ArrayList<Integer> hand = new ArrayList();
 
     public Player() {
@@ -60,6 +62,22 @@ public class Player {
         return score;
     }
 
+    public Round getRound() {
+        return round;
+    }
+
+    public void setRound(Round round) {
+        this.round = round;
+    }
+
+    public Session getSession() {
+        return session;
+    }
+
+    public void setSession(Session session) {
+        this.session = session;
+    }
+
     public void incrementScore(int score) {
         this.score += score;
     }
@@ -88,8 +106,8 @@ public class Player {
             }
         }
     }
-    
-    public void clearHand(){
+
+    public void clearHand() {
         hand = new ArrayList();
     }
 
@@ -233,7 +251,7 @@ public class Player {
                 }
             }
         }
-        
+
         if (c.size() > 2) {
             if (c.get(c.size() - 1) % 13 == 12) {
                 if (c.get(c.size() - 3) % 13 >= 10) {
@@ -294,5 +312,19 @@ public class Player {
         return b;
     }
 
+    public Call secondRoundBidding(Call call) {
+        //initiates second round of bidding for when the player is not on the caller's left
     
+        Call c1 = new Call(true);
+        return c1;
+    }
+
+    public Call secondRoundBidding(int limit, Call call) {
+        //initiates second round of bidding for when the player is on the caller's left
+        //this method takes into account that the total sum of all bids cannot equal 13
+
+        Call c1 = new Call(true);
+        return c1;
+    }
+
 }

@@ -28,8 +28,9 @@ public class Round {
     private ArrayList<Integer> cardPool = new ArrayList();
     private ArrayList<Player> players = new ArrayList();
 
-    public Round(int multiplier, ArrayList<Player> p, Session s, int dealer) {
+    public Round(int multiplier, ArrayList<Player> p, Session s, int cursor) {
         session = s;
+        call = new Call(true);
 
         if (multiplier == 2) {
             times2 = true;
@@ -49,7 +50,8 @@ public class Round {
 
         players = p;
         deal(players);
-        initiateBidding(dealer);
+        setPlayerRounds();
+        initiateBidding(cursor);
     }
 
     public Call getCall() {
@@ -172,7 +174,13 @@ public class Round {
         }
     }
 
-    public void dashCall(int dealer) {
+    public void setPlayerRounds() {
+        for (Player p : players) {
+            p.setRound(this);
+        }
+    }
+
+    public void dashCall(int cursor) {
         int i = 0;
         int dashCounter = 0;
 
@@ -181,44 +189,37 @@ public class Round {
                 setMultiplier(getMultiplier() + 2); //when two players bid dash call in one round, 
                 break;                            //the score multiplier increases by 2
             } else {
-                if (players.get(dealer).dashCall()) {
+                if (players.get(cursor).dashCall()) {
                     dashCounter++;
                 }
 
-                if (dealer == 3) {
-                    dealer = 0; //move index to next player
-                } else {
-                    dealer++;
-                }
+                cursor = nextCursor(cursor);
 
                 i++;
             }
         }
     }
 
-    public Call collectBids(int dealer) {
+    public Call collectBids(int cursor) {
         int i = 0;
-        Boolean b = false;
         int passCounter = 0;
         Call x = new Call(true);
 
         ArrayList<Call> calls = new ArrayList();
         while (i < 4) {
-            if (players.get(dealer).getCall().isDashCall()) {
+            if (players.get(cursor).getCall().isDashCall()) {
                 passCounter++;
+                cursor = nextCursor(cursor);
+                i++;
             } else {
-                Call c = players.get(dealer).openBidding();
+                Call c = players.get(cursor).openBidding();
                 calls.add(c);
 
                 if (c.isPassed()) {
                     passCounter++;
                 }
 
-                if (dealer == 3) {
-                    dealer = 0; //move index to next player
-                } else {
-                    dealer++;
-                }
+                cursor = nextCursor(cursor);
 
                 i++;
             }
@@ -238,7 +239,7 @@ public class Round {
     }
 
     public int testDashCall() {
-//        int dealer = 0;
+//        int cursor = 0;
         int dash = 0;
         for (int j = 0; j < 4; j++) {
             if (players.get(j).hasCall()) {
@@ -275,12 +276,65 @@ public class Round {
         }
     }
 
-    public void secondRoundBids(int dealer) {
-        
+    public int nextCursor(int cursor) {
+        if (cursor == 3) {
+            cursor = 0;
+        } else {
+            cursor++;
+        }
+
+        return cursor;
     }
 
-    public void initiateBidding(int dealer) {
-//        players.get(dealer).translate();
+    public int getSumOfBids() {
+        int sum = 0;
+
+        for (Player p : players) {
+            sum += p.getCall().getTricks();
+        }
+
+        return sum;
+    }
+
+    public void secondRoundBids(int cursor) {
+        int lastBidder;
+
+        if (players.get(nextCursor(nextCursor(cursor))).getCall().isDashCall()) {
+            lastBidder = nextCursor(cursor);
+        } else if (players.get(nextCursor(nextCursor(cursor))).getCall().isDashCall()
+                && players.get(nextCursor(cursor)).getCall().isDashCall()) {
+            lastBidder = cursor;
+        } else {
+            lastBidder = nextCursor(nextCursor(cursor));
+        }
+
+        int i = 0;
+
+        while (i < 3) {
+            if (!players.get(cursor).getCall().isDashCall()) {
+                if (cursor == lastBidder) {
+
+                    if (getSumOfBids() > 13) {
+                        players.get(cursor).secondRoundBidding(call.getTricks(), call);
+                    } else if (getSumOfBids() < 13) {
+                        players.get(cursor).secondRoundBidding(13 - getSumOfBids(), call);
+                    } else {
+                        players.get(cursor).secondRoundBidding(0, call);
+                    }
+
+                } else {
+                    players.get(cursor).secondRoundBidding(call);
+                }
+
+                cursor = nextCursor(cursor);
+
+                i++;
+            }
+        }
+    }
+
+    public void initiateBidding(int cursor) {
+//        players.get(cursor).translate();
 //        for (int i = 0; i < 2; i++) {
 //            for (int j = 0; j < 4; j++) {
 //                translate(players.get(j).getHand());
@@ -296,7 +350,7 @@ public class Round {
 
 //        int dashCounter = 0;
 //        int i = 0;
-//        if (dealer == 0) {
+//        if (cursor == 0) {
 //            System.out.println();
 //            for (i = 0; i < 200; i++) {
 //                Computer c1 = new Computer("Computer1");
@@ -313,7 +367,7 @@ public class Round {
 //        }
 //        int dashCounter = 0;
 //        int i = 0;
-//        if (dealer == 0) {
+//        if (cursor == 0) {
 //            System.out.println();
 //            for (i = 0; i < 200; i++) {
 //                Computer c1 = new Computer("Computer1");
@@ -328,9 +382,14 @@ public class Round {
 //
 //        }
 //        testDashCall();
-        dashCall(dealer);
-        collectBids(dealer);
-
+        dashCall(cursor);
+        call = collectBids(cursor);
+        secondRoundBids(nextCursor(players.indexOf(call.getCaller())));
+        if (getSumOfBids() > 13) {
+            System.out.println("Total bids = " + getSumOfBids() + "\nGame state = over");
+        } else {
+            System.out.println("Total bids = " + getSumOfBids() + "\nGame state = under");
+        }
     }
 
 }

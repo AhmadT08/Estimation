@@ -8,6 +8,8 @@ package estimation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Random;
+import java.util.Scanner;
 
 /**
  *
@@ -129,8 +131,45 @@ public class Computer extends Player {
 
         if (b == true) {
 //            System.out.println("\t DASHCALL!");
-            setCall(new Call(true));
+            setCall(new Call(true, this));
         }
         return b;
+    }
+
+    public Call secondRoundBidding(Call call) {
+        int bid = 0;
+        Scanner sc = new Scanner(System.in);
+
+        while (bid < 0 || bid > call.getTricks()) {
+            Random r = new Random();
+            bid = r.nextInt(call.getTricks());
+        }
+
+        Call c = new Call(bid, this);
+        setCall(c);
+
+        return c;
+    }
+
+    public Call secondRoundBidding(int limit, Call call) {
+        int bid = 0;
+        Scanner sc = new Scanner(System.in);
+
+        if (limit == 0) {
+            while (bid < 0 || bid > call.getTricks()) {
+                Random r = new Random();
+                bid = r.nextInt(call.getTricks());
+            }
+        } else {
+            while ((bid < 0 || bid > call.getTricks()) && bid != limit) {
+                Random r = new Random();
+                bid = r.nextInt(call.getTricks());
+            }
+        }
+
+        Call c = new Call(bid, this);
+        setCall(c);
+
+        return c;
     }
 }
