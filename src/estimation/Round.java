@@ -299,6 +299,14 @@ public class Round {
     public void secondRoundBids(int cursor) {
         int lastBidder;
 
+        for (int i = 0; i < 4; i++) {
+            if (players.get(i) != call.getCaller()) {
+                if (!players.get(i).getCall().isDashCall()) {
+                    players.get(i).setCall(new Call(true));
+                }
+            }
+        }
+
         if (players.get(nextCursor(nextCursor(cursor))).getCall().isDashCall()) {
             lastBidder = nextCursor(cursor);
         } else if (players.get(nextCursor(nextCursor(cursor))).getCall().isDashCall()
@@ -333,63 +341,107 @@ public class Round {
         }
     }
 
-    public void initiateBidding(int cursor) {
-//        players.get(cursor).translate();
-//        for (int i = 0; i < 2; i++) {
-//            for (int j = 0; j < 4; j++) {
-//                translate(players.get(j).getHand());
-////                System.out.println(players.get(j).getHand());
-//
-//                Set<Integer> set = new HashSet<Integer>(players.get(j).getHand());
-//
-//                if (set.size() < players.get(j).getHand().size()) {
-//                    System.out.println("Duplicates!!!!!!!!!!!!");
-//                }
-//            }
-//        }
+    public String suitChecker(int card) {
+        String x = "";
+        if (card > 0 && card < 14) {
+            x = "Clubs";
+        } else if (card > 13 && card < 27) {
+            x = "Diamonds";
+        } else if (card > 26 && card < 40) {
+            x = "Hearts";
+        } else {
+            x = "Spades";
+        }
+        return x;
+    }
 
-//        int dashCounter = 0;
-//        int i = 0;
-//        if (cursor == 0) {
-//            System.out.println();
-//            for (i = 0; i < 200; i++) {
-//                Computer c1 = new Computer("Computer1");
-//                Computer c2 = new Computer("Computer2");
-//                Computer c3 = new Computer("Computer3");
-//                Computer c4 = new Computer("Computer4");
-//                ArrayList<Player> p = new ArrayList(Arrays.asList(c1, c2, c3, c4));
-//                Round r = new Round(multiplier, p, session, 1);
-//                dashCounter += r.testDashCall();
-//            }
-//            System.out.println(dashCounter + " from " + i);
-//        } else {
-//
-//        }
-//        int dashCounter = 0;
-//        int i = 0;
-//        if (cursor == 0) {
-//            System.out.println();
-//            for (i = 0; i < 200; i++) {
-//                Computer c1 = new Computer("Computer1");
-//                Computer c2 = new Computer("Computer2");
-//                Computer c3 = new Computer("Computer3");
-//                Computer c4 = new Computer("Computer4");
-//                ArrayList<Player> p = new ArrayList(Arrays.asList(c1, c2, c3, c4));
-//                Round r = new Round(multiplier, p, session, 1);
-//                r.testHasCall();
-//            }
-//        } else {
-//
-//        }
-//        testDashCall();
+    public Player determineHandWinner(int card, ArrayList<Card> hand) {
+
+        Player p = null;
+        for (int i = 0; i < 4; i++) {
+            if (hand.get(i).number == card) {
+                p = hand.get(i).player;
+            }
+        }
+
+        System.out.println("\t" + p.getName() + " wins the hand with the " + p.translate(card));
+
+        return p;
+    }
+
+    public void winLoss() {
+        for (Player p : players) {
+            if (p.getCall().getTricks() == p.getTricks()) {
+                System.out.println("\n" + p.getName() + " bid " + p.getCall().getTricks() + " and collected " + p.getTricks());
+                System.out.println(p.getName() + " wins");
+            } else {
+                System.out.println("\n" + p.getName() + " bid " + p.getCall().getTricks() + " and collected " + p.getTricks());
+                System.out.println(p.getName() + " loses");
+            }
+        }
+    }
+
+    public void start(int cursor) {
+        System.out.println("Round has started. " + call.getCaller().getName() + " starts.");
+
+        ArrayList<Card> hand = new ArrayList();
+        ArrayList<Player> cardPlayers = new ArrayList();
+
+        Suit trumpSuit = Suit.returnSuitByName(call.getSuit());
+        Suit suit;
+
+        for (int i = 0; i < 13; i++) {
+            int first = players.get(cursor).playCard();
+            hand.add(new Card(first, players.get(cursor)));
+            cursor = nextCursor(cursor);
+
+            suit = Suit.returnSuitByCard(first);
+
+            for (int j = 0; j < 3; j++) {
+                hand.add(new Card(players.get(cursor).playCard(suit, trumpSuit), players.get(cursor)));
+                cursor = nextCursor(cursor);
+            }
+            Boolean b = false;
+
+            for (int j = 0; j < 4; j++) {
+                if (trumpSuit.trumpCheck(hand.get(j).number)) {
+                    b = true;
+                }
+            }
+
+            ArrayList<Integer> handCards = new ArrayList();
+
+            for (int k = 0; k < 4; k++) {
+                handCards.add(hand.get(k).number);
+            }
+
+            if (b) {
+                Player p = determineHandWinner(trumpSuit.compareWeight(handCards, suit), hand);
+                p.addTrick();
+                cursor = players.indexOf(p);
+            } else {
+                Player p = determineHandWinner(suit.compareWeight(handCards, suit), hand);
+                p.addTrick();
+                cursor = players.indexOf(p);
+            }
+
+            hand.clear();
+        }
+    }
+
+    public void initiateBidding(int cursor) {
         dashCall(cursor);
         call = collectBids(cursor);
         secondRoundBids(nextCursor(players.indexOf(call.getCaller())));
+
         if (getSumOfBids() > 13) {
             System.out.println("Total bids = " + getSumOfBids() + "\nGame state = over");
         } else {
             System.out.println("Total bids = " + getSumOfBids() + "\nGame state = under");
         }
+
+        start(players.indexOf(call.getCaller()));
+        winLoss();
     }
 
 }

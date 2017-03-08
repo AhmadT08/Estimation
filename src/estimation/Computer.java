@@ -145,7 +145,7 @@ public class Computer extends Player {
             bid = r.nextInt(call.getTricks());
         }
 
-        Call c = new Call(bid, this);
+        Call c = new Call(bid, this, call.getSuit());
         setCall(c);
 
         return c;
@@ -167,7 +167,7 @@ public class Computer extends Player {
             }
         }
 
-        Call c = new Call(bid, this);
+        Call c = new Call(bid, this, call.getSuit());
         setCall(c);
 
         return c;

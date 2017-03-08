@@ -99,7 +99,6 @@ public class Player {
     }
 
     public void removeCardFromHand(int c) {
-
         for (int i = 0; i < hand.size(); i++) {
             if (hand.get(i) == c) {
                 hand.remove(i);
@@ -116,6 +115,127 @@ public class Player {
     }
 
     public void translate() {
+        Collections.sort(hand);
+        Collections.reverse(hand);
+
+        for (int j = 0; j < 13; j++) {
+            int card = hand.get(j); //Get next card
+            if ((card - 1) / 13 == 0) { //Check if card is in the first 13 cards of the deck (Clubs)
+                if (card % 13 == 0) {
+                    System.out.println("Ace of Clubs"); //The ace is the 13th card in the suit
+                } else if (card % 13 == 12) {
+                    System.out.println("King of Clubs"); //The king is the 12th card in the suit
+                } else if (card % 13 == 11) {
+                    System.out.println("Queen of Clubs"); //The queen is the 11th card in the suit
+                } else if (card % 13 == 10) {
+                    System.out.println("Jack of Clubs"); //The jack is the 10th card in the suit 
+                } else {
+                    System.out.println(((card % 13) + 1) + " of Clubs");
+                }
+            }
+            if ((card - 1) / 13 == 1) {
+                if (card % 13 == 0) {
+                    System.out.println("Ace of Diamonds");
+                } else if (card % 13 == 12) {
+                    System.out.println("King of Diamonds");
+                } else if (card % 13 == 11) {
+                    System.out.println("Queen of Diamonds");
+                } else if (card % 13 == 10) {
+                    System.out.println("Jack of Diamonds");
+                } else {
+                    System.out.println(((card % 13) + 1) + " of Diamonds");
+                }
+            }
+            if ((card - 1) / 13 == 2) {
+                if (card % 13 == 0) {
+                    System.out.println("Ace of Hearts");
+                } else if (card % 13 == 12) {
+                    System.out.println("King of Hearts");
+                } else if (card % 13 == 11) {
+                    System.out.println("Queen of Hearts");
+                } else if (card % 13 == 10) {
+                    System.out.println("Jack of Hearts");
+                } else {
+                    System.out.println(((card % 13) + 1) + " of Hearts");
+                }
+            }
+            if ((card - 1) / 13 == 3) {
+                if (card % 13 == 0) {
+                    System.out.println("Ace of Spades");
+                } else if (card % 13 == 12) {
+                    System.out.println("King of Spades");
+                } else if (card % 13 == 11) {
+                    System.out.println("Queen of Spades");
+                } else if (card % 13 == 10) {
+                    System.out.println("Jack of Spades");
+                } else {
+                    System.out.println(((card % 13) + 1) + " of Spades");
+                }
+            }
+
+        }
+    }
+
+    public String translate(int card) {
+        String x = "";
+        
+        if ((card - 1) / 13 == 0) { //Check if card is in the first 13 cards of the deck (Clubs)
+            if (card % 13 == 0) {
+                x = "Ace of Clubs"; //The ace is the 13th card in the suit
+            } else if (card % 13 == 12) {
+                x = "King of Clubs"; //The king is the 12th card in the suit
+            } else if (card % 13 == 11) {
+                x = "Queen of Clubs"; //The queen is the 11th card in the suit
+            } else if (card % 13 == 10) {
+                x = "Jack of Clubs"; //The jack is the 10th card in the suit 
+            } else {
+                x = ((card % 13) + 1) + " of Clubs";
+            }
+        }
+        if ((card - 1) / 13 == 1) {
+            if (card % 13 == 0) {
+                x = "Ace of Diamonds";
+            } else if (card % 13 == 12) {
+                x = "King of Diamonds";
+            } else if (card % 13 == 11) {
+                x = "Queen of Diamonds";
+            } else if (card % 13 == 10) {
+                x = "Jack of Diamonds";
+            } else {
+                x = ((card % 13) + 1) + " of Diamonds";
+            }
+        }
+        if ((card - 1) / 13 == 2) {
+            if (card % 13 == 0) {
+                x = "Ace of Hearts";
+            } else if (card % 13 == 12) {
+                x = "King of Hearts";
+            } else if (card % 13 == 11) {
+                x = "Queen of Hearts";
+            } else if (card % 13 == 10) {
+                x = "Jack of Hearts";
+            } else {
+                x = ((card % 13) + 1) + " of Hearts";
+            }
+        }
+        if ((card - 1) / 13 == 3) {
+            if (card % 13 == 0) {
+                x = "Ace of Spades";
+            } else if (card % 13 == 12) {
+                x = "King of Spades";
+            } else if (card % 13 == 11) {
+                x = "Queen of Spades";
+            } else if (card % 13 == 10) {
+                x = "Jack of Spades";
+            } else {
+                x = ((card % 13) + 1) + " of Spades";
+            }
+        }
+        
+        return x;
+    }
+
+    public void translate(ArrayList<Integer> hand) {
         Collections.sort(hand);
         Collections.reverse(hand);
 
@@ -226,6 +346,57 @@ public class Player {
 
         return b;
     }
+    
+    public Boolean isAvoid(String suit){
+        Boolean b = false;        
+
+        ArrayList<Integer> h = getHand();
+        ArrayList<Integer> spades = new ArrayList();
+        ArrayList<Integer> hearts = new ArrayList();
+        ArrayList<Integer> diamonds = new ArrayList();
+        ArrayList<Integer> clubs = new ArrayList();
+
+        for (Integer h1 : h) { //Organize hand into suits
+            int card = h1; //Get next card
+            if ((card - 1) / 13 == 0) { //Check if card is in the first 13 cards of the deck (Clubs)
+                clubs.add(card);
+            }
+            if ((card - 1) / 13 == 1) {
+                diamonds.add(card);
+            }
+            if ((card - 1) / 13 == 2) {
+                hearts.add(card);
+            }
+            if ((card - 1) / 13 == 3) {
+                spades.add(card);
+            }
+        }
+
+        switch (suit) {
+            case "Clubs":
+                if(clubs.isEmpty()){
+                    b = true;
+                }
+                break;
+            case "Diamonds":
+                if(diamonds.isEmpty()){
+                    b = true;
+                }
+                break;
+            case "Hearts":
+                if(hearts.isEmpty()){
+                    b = true;
+                }
+                break;
+            case "Spades":
+                if(spades.isEmpty()){
+                    b = true;
+                }
+                break;
+        }
+        
+        return b;
+    }
 
     public Boolean fullHouse(ArrayList<Integer> c) {
         Boolean b = false;
@@ -314,7 +485,7 @@ public class Player {
 
     public Call secondRoundBidding(Call call) {
         //initiates second round of bidding for when the player is not on the caller's left
-    
+
         Call c1 = new Call(true);
         return c1;
     }
@@ -325,6 +496,14 @@ public class Player {
 
         Call c1 = new Call(true);
         return c1;
+    }
+
+    public int playCard() {
+        return 0;
+    }
+    
+    public int playCard(Suit suit, Suit trumpSuit){
+        return 0;
     }
 
 }

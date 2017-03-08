@@ -5,6 +5,8 @@
  */
 package estimation;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Scanner;
 
 /**
@@ -115,7 +117,7 @@ public class User extends Player {
 
         int bid = -1;
         Scanner sc = new Scanner(System.in);
-
+        
         while (bid < 0 || bid > call.getTricks()) {
             System.out.println("Make a bid between 0 and " + call.getTricks());
 
@@ -133,26 +135,32 @@ public class User extends Player {
     }
 
     public Call secondRoundBidding(int limit, Call call) {
-        System.out.println("\n" + name + "\n");
+        System.out.println("\n" + name);
 
         int bid = -1;
         Scanner sc = new Scanner(System.in);
 
         if (limit == 0) {
             while (bid < 0 || bid > call.getTricks()) {
-                System.out.println("Make a bid greater than " + limit + " and less than or equal to " + call.getTricks());
+                bid = limit;
+                System.out.println();
 
-                try {
-                    bid = Integer.parseInt(sc.nextLine());
-                } catch (Exception E) {
-                    System.out.println("Please enter a number");
+                while (bid == limit) {
+                    System.out.println("Make a bid greater than " + limit + " and less than or equal to " + call.getTricks());
+
+                    try {
+                        bid = Integer.parseInt(sc.nextLine());
+                    } catch (Exception E) {
+                        System.out.println("Please enter a number");
+                    }
                 }
             }
         } else {
             while (bid < 0 || bid > call.getTricks()) {
                 bid = limit;
-                
+
                 while (bid == limit) {
+
                     System.out.println("Make a bid not equal to " + limit + " and less than or equal to " + call.getTricks());
 
                     try {
@@ -166,8 +174,78 @@ public class User extends Player {
 
         Call c = new Call(bid, this);
         setCall(c);
+        c.setSuit(call.getSuit());
 
         return c;
     }
 
+    public int playCard() {
+        System.out.println(name);
+
+        ArrayList<Integer> hand = getHand();
+        Collections.sort(hand);
+        Collections.reverse(hand);
+
+        for (int i = 0; i < hand.size(); i++) {
+            System.out.println(i + 1 + ") " + translate(hand.get(i)));
+        }
+
+        int number = 0;
+        int result = 0;
+        Scanner sc = new Scanner(System.in);
+
+        while (number < 1 || number > hand.size()) {
+            System.out.println("Please choose a number between 1 and " + hand.size());
+            try {
+                number = Integer.parseInt(sc.nextLine());
+                result = hand.get(number - 1);
+            } catch (Exception E) {
+
+            }
+        }
+        removeCardFromHand(result);
+        return result;
+    }
+
+    public int playCard(Suit suit, Suit trumpSuit) {
+        System.out.println(name);
+
+        ArrayList<Integer> hand = getHand();
+        Collections.sort(hand);
+        Collections.reverse(hand);
+
+        for (int i = 0; i < hand.size(); i++) {
+            System.out.println(i + 1 + ") " + translate(hand.get(i)));
+        }
+
+        int number = 0;
+        int result = 0;
+        Scanner sc = new Scanner(System.in);
+
+        while (number < 1 || number > hand.size()) {
+            if (isAvoid(suit.getName())) {
+                System.out.println("Please choose a number between 1 and " + hand.size());
+                try {
+                    number = Integer.parseInt(sc.nextLine());
+                    result = hand.get(number - 1);
+                } catch (Exception E) {
+
+                }
+//            } else if (Suit.returnSuitByCard(result).getClass() == suit.getClass()) {
+            } else {
+                while (!suit.trumpCheck(result)) {
+                    System.out.println("Please choose a card from the suit " + suit.getName());
+
+                    try {
+                        number = Integer.parseInt(sc.nextLine());
+                        result = hand.get(number - 1);
+                    } catch (Exception E) {
+
+                    }
+                }
+            }
+        }
+        removeCardFromHand(result);
+        return result;
+    }
 }

@@ -5,6 +5,17 @@
  */
 package estimation;
 
-public class Suite {
-
+/**
+ *
+ * @author Ahmad
+ */
+public class Card {
+    public int number;
+    public Player player;
+    
+    Card(int n, Player p){
+        number = n;
+        player = p;
+    }
+    
 }

@@ -15,7 +15,7 @@ import java.util.Arrays;
 public class Call {
 
     private int tricks;
-    private String suit = "";
+    private Suit suit;
     private Boolean dashCall;
     private Boolean pass;
     private Player caller;
@@ -23,7 +23,25 @@ public class Call {
 
     public Call(int tricks, String suit, Boolean dashcall, Player p) {
         this.tricks = tricks;
-        this.suit = suit;
+        
+        switch (suit) {
+            case "Clubs":
+                this.suit = new Clubs();
+                break;
+            case "Diamonds":
+                this.suit = new Diamonds();
+                break;
+            case "Hearts":
+                this.suit = new Hearts();
+                break;
+            case "Spades":
+                this.suit = new Spades(); 
+                break;
+            case "Suns":
+                this.suit = new Suns();
+                break;
+        }
+        
         pass = false;
         if (tricks > 0) {
             this.dashCall = false;
@@ -32,6 +50,31 @@ public class Call {
         caller = p;
     }
 
+    public Call(int tricks, Player p, String suit) {
+        this.tricks = tricks;
+        dashCall = false;
+        pass = false;
+        caller = p;
+        
+        switch (suit) {
+            case "Clubs":
+                this.suit = new Clubs();
+                break;
+            case "Diamonds":
+                this.suit = new Diamonds();
+                break;
+            case "Hearts":
+                this.suit = new Hearts();
+                break;
+            case "Spades":
+                this.suit = new Spades();
+                break;
+            case "Suns":
+                this.suit = new Suns();
+                break;
+        }
+    }
+    
     public Call(int tricks, Player p) {
         this.tricks = tricks;
         dashCall = false;
@@ -61,11 +104,27 @@ public class Call {
     }
 
     public String getSuit() {
-        return suit;
+        return suit.getName();
     }
 
     public void setSuit(String suit) {
-        this.suit = suit;
+        switch (suit) {
+            case "Clubs":
+                this.suit = new Clubs();
+                break;
+            case "Diamonds":
+                this.suit = new Diamonds();
+                break;
+            case "Hearts":
+                this.suit = new Hearts();
+                break;
+            case "Spades":
+                this.suit = new Spades();
+                break;
+            case "Suns":
+                this.suit = new Suns();
+                break;
+        }
     }
 
     public Boolean isDashCall() {
@@ -112,11 +171,11 @@ public class Call {
 
         if (c.tricks > this.tricks) {
             b = false;
-        } else if (c.tricks == this.tricks && c.suit.equals(returnLargerSuit(c.suit, this.suit))) {
+        } else if (c.tricks == this.tricks && c.suit.getName().equals(returnLargerSuit(c.suit.getName(), this.suit.getName()))) {
             b = false;
-        } else if (c.tricks == this.tricks && this.suit.equals(c.suit)) {
+        } else if (c.tricks == this.tricks && this.suit.getName().equals(c.suit.getName())) {
             b = false;
-        } else if (c.tricks == this.tricks && this.suit.equals(returnLargerSuit(c.suit, this.suit))) {
+        } else if (c.tricks == this.tricks && this.suit.getName().equals(returnLargerSuit(c.suit.getName(), this.suit.getName()))) {
             b = true;
         } else if (c.tricks < this.tricks) {
             b = true;

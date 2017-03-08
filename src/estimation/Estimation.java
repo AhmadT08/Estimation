@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Random;
+import java.util.Scanner;
 
 /**
  *
@@ -100,6 +101,30 @@ public class Estimation {
     }
 
     public static void main(String[] args) {
+//        User u1 = new User("Ahmad");
+//        u1.addCardToHand(5); u1.addCardToHand(12); u1.addCardToHand(42); u1.addCardToHand(51);
+//        u1.addCardToHand(16); u1.addCardToHand(9); u1.addCardToHand(41); u1.addCardToHand(21);
+//        u1.addCardToHand(1); u1.addCardToHand(11); u1.addCardToHand(31); u1.addCardToHand(50);
+//        u1.addCardToHand(52);
+//        System.out.println(u1.getHand());
+//        Scanner sc = new Scanner(System.in);
+
+//        System.out.println(u1.translate(sc.nextInt()));
+
+//        ArrayList<Integer> x = new ArrayList();
+//        Spades s = new Spades();
+//        Diamonds d = new Diamonds();
+//        Hearts h = new Hearts();
+//        Clubs c = new Clubs();
+//        
+//        x.add(38);
+//        x.add(12);
+//        x.add(26);
+//        x.add(11);
+//        Collections.sort(x);
+//        System.out.println(s.compareWeight(x, c));
+        
+        
         User u1 = new User("Ahmad");
         User u2 = new User("Negm");
         User u3 = new User("Ramy");
@@ -111,7 +136,6 @@ public class Estimation {
         Computer c4 = new Computer("Computer4");
 
         Session s1 = new Session(u1, u2, u3, u4, "Easy");
-
     }
 
 }
