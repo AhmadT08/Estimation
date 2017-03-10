@@ -337,6 +337,9 @@ public class Round {
                 cursor = nextCursor(cursor);
 
                 i++;
+            } else {
+                cursor = nextCursor(cursor);
+                i++;
             }
         }
     }
@@ -356,15 +359,16 @@ public class Round {
     }
 
     public Player determineHandWinner(int card, ArrayList<Card> hand) {
-
         Player p = null;
+        
         for (int i = 0; i < 4; i++) {
             if (hand.get(i).number == card) {
                 p = hand.get(i).player;
             }
         }
-
-        System.out.println("\t" + p.getName() + " wins the hand with the " + p.translate(card));
+        
+        p.addTrick();
+        System.out.println("\t" + p.getName() + " wins the hand with the " + p.translate(card)+"\n");
 
         return p;
     }
@@ -417,11 +421,9 @@ public class Round {
 
             if (b) {
                 Player p = determineHandWinner(trumpSuit.compareWeight(handCards, suit), hand);
-                p.addTrick();
                 cursor = players.indexOf(p);
             } else {
                 Player p = determineHandWinner(suit.compareWeight(handCards, suit), hand);
-                p.addTrick();
                 cursor = players.indexOf(p);
             }
 
@@ -432,12 +434,21 @@ public class Round {
     public void initiateBidding(int cursor) {
         dashCall(cursor);
         call = collectBids(cursor);
+        call.getCaller().setCaller(true);
+        
+        for(Player p:players){
+            if(!p.isCaller()){
+                p.getCall().setSuit(call.getSuit());
+                p.clearTricks();
+            }
+        }
+        
         secondRoundBids(nextCursor(players.indexOf(call.getCaller())));
 
         if (getSumOfBids() > 13) {
-            System.out.println("Total bids = " + getSumOfBids() + "\nGame state = over");
+            System.out.println("Total bids = " + getSumOfBids() + "\nGame state = over "+(getSumOfBids()-13)+"\n");
         } else {
-            System.out.println("Total bids = " + getSumOfBids() + "\nGame state = under");
+            System.out.println("Total bids = " + getSumOfBids() + "\nGame state = under "+(13-getSumOfBids())+"\n");
         }
 
         start(players.indexOf(call.getCaller()));

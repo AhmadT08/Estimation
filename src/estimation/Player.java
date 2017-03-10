@@ -17,7 +17,7 @@ public class Player {
 
     protected String name;
     private int score;
-    private Call c;
+    private Call call;
     private Boolean caller;
     private int position;
     private int tricks;
@@ -27,7 +27,9 @@ public class Player {
 
     public Player() {
         score = 0;
-        c = new Call(true);
+        tricks = 0;
+        call = new Call(true);
+        caller = false;
     }
 
     public String getName() {
@@ -35,11 +37,11 @@ public class Player {
     }
 
     public Call getCall() {
-        return c;
+        return call;
     }
 
     public void setCall(Call c) {
-        this.c = c;
+        this.call = c;
     }
 
     public Boolean isCaller() {
@@ -56,6 +58,10 @@ public class Player {
 
     public void addTrick() {
         tricks++;
+    }
+    
+    public void clearTricks(){
+        tricks = 0;
     }
 
     public int getScore() {

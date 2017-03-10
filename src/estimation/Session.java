@@ -32,6 +32,7 @@ public class Session {
     }
     
     public void Start() {
+        setPlayerSession();
         roundNumber = 1;
         r = new Round(1, players, this, dealer);
         clearPlayerHands();

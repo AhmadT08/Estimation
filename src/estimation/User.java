@@ -59,6 +59,8 @@ public class User extends Player {
     }
 
     public Call openBidding() {
+        //players declare their bid along with the trump suit
+
         System.out.println("\n" + name + "\n");
         Call c = new Call(true);
         Boolean callInvalid = true;
@@ -113,13 +115,50 @@ public class User extends Player {
     }
 
     public Call secondRoundBidding(Call call) {
+        //players estimate how many tricks they can get, given the call
+
         System.out.println("\n" + name + "\n");
 
         int bid = -1;
         Scanner sc = new Scanner(System.in);
-        
-        while (bid < 0 || bid > call.getTricks()) {
-            System.out.println("Make a bid between 0 and " + call.getTricks());
+
+        Boolean b = true;
+        while (b) {
+            if (bid < 0 || bid > call.getTricks()) {
+                System.out.println("Make a bid between 0 and " + call.getTricks());
+
+                try {
+                    bid = Integer.parseInt(sc.nextLine());
+                } catch (Exception E) {
+                    System.out.println("Please enter a number");
+                }
+            } else {
+                b = false;
+            }
+        }
+
+        Call c = new Call(bid, this);
+        c.setSuit(getRound().getCall().getSuit());
+        setCall(c);
+
+        return c;
+    }
+
+    public Call secondRoundBidding(int limit, Call call) {
+        //players estimate how many tricks they can get given the call
+        //for the last player bidding
+        //bid must not be equal to the limit
+
+        System.out.println("\n" + name);
+
+        int bid = -1;
+        Scanner sc = new Scanner(System.in);
+
+        Boolean b = true;
+
+        while (!inRange(bid, limit, call)) {
+
+            System.out.println("Make a bid not equal to " + limit + " and less than or equal to " + call.getTricks());
 
             try {
                 bid = Integer.parseInt(sc.nextLine());
@@ -128,59 +167,60 @@ public class User extends Player {
             }
         }
 
+//        if (limit == 0) {
+//            while (b) {
+//                if (bid < 0 || bid > call.getTricks()) {
+//                    bid = limit;
+//                    System.out.println();
+//
+//                    while (bid == limit) {
+//                        System.out.println("Make a bid greater than " + limit + " and less than or equal to " + call.getTricks());
+//
+//                        try {
+//                            bid = Integer.parseInt(sc.nextLine());
+//                        } catch (Exception E) {
+//                            System.out.println("Please enter a number");
+//                        }
+//                    }
+//                } else {
+//                    b = false;
+//                }
+//            }
+//        } else {
+//            while (bid < 0 || bid > call.getTricks()) {
+//                bid = limit;
+//
+//                while (bid == limit) {
+//
+//                    System.out.println("Make a bid not equal to " + limit + " and less than or equal to " + call.getTricks());
+//
+//                    try {
+//                        bid = Integer.parseInt(sc.nextLine());
+//                    } catch (Exception E) {
+//                        System.out.println("Please enter a number");
+//                    }
+//                }
+//            }
+//        }
         Call c = new Call(bid, this);
+        c.setSuit(getRound().getCall().getSuit());
         setCall(c);
-
-        return c;
-    }
-
-    public Call secondRoundBidding(int limit, Call call) {
-        System.out.println("\n" + name);
-
-        int bid = -1;
-        Scanner sc = new Scanner(System.in);
-
-        if (limit == 0) {
-            while (bid < 0 || bid > call.getTricks()) {
-                bid = limit;
-                System.out.println();
-
-                while (bid == limit) {
-                    System.out.println("Make a bid greater than " + limit + " and less than or equal to " + call.getTricks());
-
-                    try {
-                        bid = Integer.parseInt(sc.nextLine());
-                    } catch (Exception E) {
-                        System.out.println("Please enter a number");
-                    }
-                }
-            }
-        } else {
-            while (bid < 0 || bid > call.getTricks()) {
-                bid = limit;
-
-                while (bid == limit) {
-
-                    System.out.println("Make a bid not equal to " + limit + " and less than or equal to " + call.getTricks());
-
-                    try {
-                        bid = Integer.parseInt(sc.nextLine());
-                    } catch (Exception E) {
-                        System.out.println("Please enter a number");
-                    }
-                }
-            }
-        }
-
-        Call c = new Call(bid, this);
-        setCall(c);
-        c.setSuit(call.getSuit());
 
         return c;
     }
 
     public int playCard() {
-        System.out.println(name);
+        //user chooses a card to play
+        //for the play who plays the first card in a hand
+
+        System.out.println();
+        if (isCaller()) {
+            System.out.println(name + " (C) [" + getCall().getTricks() + " " + getCall().getSuit() + "] Tricks [" + getTricks() + "]\n");
+        } else if (getCall().isDashCall()) {
+            System.out.println(name + " (DC) [" + getCall().getTricks() + " " + getCall().getSuit() + "] Tricks [" + getTricks() + "]\n");
+        } else {
+            System.out.println(name + " [" + getCall().getTricks() + " " + getCall().getSuit() + "] Tricks [" + getTricks() + "]\n");
+        }
 
         ArrayList<Integer> hand = getHand();
         Collections.sort(hand);
@@ -203,12 +243,23 @@ public class User extends Player {
 
             }
         }
+        System.out.println(name + " played the " + translate(result));
         removeCardFromHand(result);
         return result;
     }
 
     public int playCard(Suit suit, Suit trumpSuit) {
-        System.out.println(name);
+        //user chooses a card to play
+        //for all players aside from the first player to play the hand
+
+        System.out.println();
+        if (isCaller()) {
+            System.out.println(name + " (C) [" + getCall().getTricks() + " " + getCall().getSuit() + "] Tricks [" + getTricks() + "]\n");
+        } else if (getCall().isDashCall()) {
+            System.out.println(name + " (DC) [" + getCall().getTricks() + " " + getCall().getSuit() + "] Tricks [" + getTricks() + "]\n");
+        } else {
+            System.out.println(name + " [" + getCall().getTricks() + " " + getCall().getSuit() + "] Tricks [" + getTricks() + "]\n");
+        }
 
         ArrayList<Integer> hand = getHand();
         Collections.sort(hand);
@@ -217,6 +268,7 @@ public class User extends Player {
         for (int i = 0; i < hand.size(); i++) {
             System.out.println(i + 1 + ") " + translate(hand.get(i)));
         }
+        System.out.println();
 
         int number = 0;
         int result = 0;
@@ -245,7 +297,47 @@ public class User extends Player {
                 }
             }
         }
+        System.out.println(name + " played the " + translate(result) + "\n");
         removeCardFromHand(result);
         return result;
+    }
+
+    public Boolean inRange(int bid, int limit, Call call) {
+        //checks if a bid is in valid range of a call and its limit
+        //for the last player bidding in the second round bidding
+        Boolean b = false;
+        ArrayList<Integer> range = new ArrayList();
+
+        for (int i = 0; i < 13; i++) {
+            if (limit != i) {
+                if (i <= call.getTricks()) {
+                    range.add(i);
+                }
+            }
+        }
+
+        if (range.contains(bid)) {
+            b = true;
+        }
+        return b;
+    }
+
+    public Boolean inRange(int bid, Call call) {
+        //checks if a bid is in valid range of a call
+        Boolean b = false;
+        ArrayList<Integer> range = new ArrayList();
+
+        for (int i = 0; i < 13; i++) {
+
+            if (i <= call.getTricks()) {
+                range.add(i);
+            }
+
+        }
+
+        if (range.contains(bid)) {
+            b = true;
+        }
+        return b;
     }
 }
