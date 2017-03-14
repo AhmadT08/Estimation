@@ -78,7 +78,7 @@ public class Call {
     public Call(int tricks, Player p) {
         this.tricks = tricks;
         dashCall = false;
-        pass = false;
+        pass = true; //used to be pass = false;
         caller = p;
     }
 
