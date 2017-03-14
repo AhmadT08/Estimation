@@ -5,20 +5,26 @@
  */
 package estimation;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author Ahmad
  */
 public class Suns extends Suit {
+    
+    Suns(){
+        
+        cards = new ArrayList();
+        for (int i = 1; i < 53; i++) {
+            cards.add(i);
+        }
+    }
 
     @Override
     public String getName() {
         return "Suns";
     }
 
-    @Override
-    public Boolean compareWeight(int x, int y) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
     
 }
