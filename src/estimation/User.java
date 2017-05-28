@@ -20,6 +20,7 @@ public class User extends Player {
         name = n;
     }
 
+    @Override
     public Boolean dashCall() {
         Boolean b = false;
 
@@ -58,6 +59,7 @@ public class User extends Player {
         return b;
     }
 
+    @Override
     public Call openBidding() {
         //players declare their bid along with the trump suit
 
@@ -114,6 +116,7 @@ public class User extends Player {
         return c;
     }
 
+    @Override
     public Call secondRoundBidding(Call call) {
         //players estimate how many tricks they can get, given the call
 
@@ -144,6 +147,7 @@ public class User extends Player {
         return c;
     }
 
+    @Override
     public Call secondRoundBidding(int limit, Call call) {
         //players estimate how many tricks they can get given the call
         //for the last player bidding
@@ -209,6 +213,7 @@ public class User extends Player {
         return c;
     }
 
+    @Override
     public int playCard() {
         //user chooses a card to play
         //for the play who plays the first card in a hand
@@ -248,6 +253,7 @@ public class User extends Player {
         return result;
     }
 
+    @Override
     public int playCard(Suit suit, Suit trumpSuit) {
         //user chooses a card to play
         //for all players aside from the first player to play the hand

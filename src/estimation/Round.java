@@ -191,6 +191,7 @@ public class Round {
             } else {
                 if (players.get(cursor).dashCall()) {
                     dashCounter++;
+                    System.out.println(players.get(cursor).name + " Dash call!");
                 }
 
                 cursor = nextCursor(cursor);
