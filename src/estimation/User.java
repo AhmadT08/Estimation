@@ -216,7 +216,7 @@ public class User extends Player {
     @Override
     public int playCard() {
         //user chooses a card to play
-        //for the play who plays the first card in a hand
+        //for the player who plays the first card in a hand
 
         System.out.println();
         if (isCaller()) {

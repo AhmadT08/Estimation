@@ -17,8 +17,6 @@ import java.util.Scanner;
  */
 public class Computer extends Player {
 
-    public Boolean raise = false;
-
     public Computer(String n) {
         super();
         name = n;
@@ -1166,5 +1164,10 @@ public class Computer extends Player {
         translate();
         System.out.println(bid + " tricks \n\n");
         return c;
+    }
+    
+    @Override
+    public int playCard(){
+        return 0;
     }
 }
