@@ -451,8 +451,7 @@ public class Round {
             for (int j = 0; j < 4; j++) {
                 if (trumpSuit.trumpCheck(hand.get(j).number)) {
                     b = true;
-                }
-            }
+            }                }
 
             ArrayList<Integer> handCards = new ArrayList();
 

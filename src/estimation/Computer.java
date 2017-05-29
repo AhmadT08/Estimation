@@ -7,6 +7,7 @@ package estimation;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -15,6 +16,8 @@ import java.util.Scanner;
  * @author Ahmad
  */
 public class Computer extends Player {
+
+    public Boolean raise = false;
 
     public Computer(String n) {
         super();
@@ -48,6 +51,7 @@ public class Computer extends Player {
         int tricks, suitSize;
         tricks = 0;
         suitSize = suit.size();
+        int lowestNonMaster = 0;
         int masters = numberOfMasters(suit);
         Boolean ace, king, queen, jack;
         ace = king = queen = jack = false;
@@ -65,40 +69,532 @@ public class Computer extends Player {
             if (suit.get(i) % 13 == 10) {
                 jack = true;
             }
+            if (suit.get(i) % 13 < 10 && suit.get(i) % 13 < lowestNonMaster) {
+                lowestNonMaster = suit.get(i) % 13;
+            }
         }
 
-        if (Case == 3) {
-            tricks += suit.size();
-        } else if (Case < 5 && Case != 3) {
-            if (jack && suit.size() >= 4) {
-                tricks++;
-            }
-            if (queen && suit.size() >= 3) {
-                tricks++;
-            }
-            if (king && suit.size() >= 2) {
-                tricks++;
-            }
-            if (ace) {
-                tricks++;
-            }
-        } else if (Case == 5) {
-            if (masters == 2 && suitSize == 5) {
-                if (ace && king) {
-                    tricks += (suitSize - 1);
-                } else {
+        switch (Case) {
+            case 3:
+                tricks += suit.size();
+                break;
+            case 5:
+                if (masters == 2 && suitSize == 5) {
                     tricks += (suitSize - 2);
+                } else if (masters > 2) {
+                    if (suitSize < 7) {
+                        tricks += (suitSize - 2);
+                    } else {
+                        if (ace && king) {
+                            tricks += suitSize;
+                        } else {
+                            tricks += (suitSize - 1);
+                        }
+                    }
                 }
-            } else if (masters > 2) {
-                if (suitSize < 7) {
-                    tricks += (suitSize - 1);
-                } else {
-                    tricks += suitSize;
+                break;
+            case 6: //trump suit
+                if (queen && suitSize >= 3) {
+                    if (lowestNonMaster > 5) {
+                        tricks++;
+                    }
+                }
+                if (king && suitSize >= 2) {
+                    tricks++;
+                }
+                if (ace) {
+                    tricks++;
+                }
+                if (!ace && !king && !queen && !jack && suitSize > 4) {
+                    tricks += (suitSize - 4);
+                } else if (ace || king || queen || jack) {
+                    if (suitSize >= 5 && masters == 2) {
+                        tricks += (suitSize - 4);
+                    }
+                }
+                break;
+            case 7: //non-trump suit
+                if (king && suitSize >= 2) {
+                    tricks++;
+                }
+                if (ace) {
+                    tricks++;
+                }
+                break;
+            default:
+                if (queen && suit.size() >= 3) {
+                    tricks++;
+                }
+                if (king && suit.size() >= 2) {
+                    tricks++;
+                }
+                if (ace) {
+                    tricks++;
+                }
+                break;
+        }
+
+//        if (Case == 3) {
+//            tricks += suit.size();
+//        } else if (Case < 5 && Case != 3) {
+//            if (queen && suit.size() >= 3) {
+//                tricks++;
+//            }
+//            if (king && suit.size() >= 2) {
+//                tricks++;
+//            }
+//            if (ace) {
+//                tricks++;
+//            }
+//        } else if (Case == 5) {
+//            if (masters == 2 && suitSize == 5) {
+//                tricks += (suitSize - 2);
+//            } else if (masters > 2) {
+//                if (suitSize < 7) {
+//                    tricks += (suitSize - 2);
+//                } else {
+//                    if (ace && king) {
+//                        tricks += suitSize;
+//                    } else {
+//                        tricks += (suitSize - 1);
+//                    }
+//                }
+//            }
+//        }
+        return tricks;
+    }
+
+    public int determineMaxSuitTricks(ArrayList<Integer> suit, int Case) {
+        int tricks, suitSize;
+        tricks = 0;
+        suitSize = suit.size();
+        int masters = numberOfMasters(suit);
+        Boolean ace, king, queen, jack;
+        ace = king = queen = jack = false;
+
+        for (int i = 0; i < suitSize; i++) {
+            if (suit.get(i) % 13 == 0) {
+                ace = true;
+            }
+            if (suit.get(i) % 13 == 12) {
+                king = true;
+            }
+            if (suit.get(i) % 13 == 11) {
+                queen = true;
+            }
+            if (suit.get(i) % 13 == 10) {
+                jack = true;
+            }
+        }
+
+        switch (Case) {
+            case 3:
+                tricks += suitSize;
+                break;
+            case 5:
+                if (masters == 2 && suitSize == 5) {
+                    if (ace && king) {
+                        tricks += (suitSize - 1);
+                    } else {
+                        tricks += (suitSize - 2);
+                    }
+                } else if (masters > 2) {
+                    if (suitSize < 7) {
+                        tricks += (suitSize - 1);
+                    } else {
+                        tricks += suitSize;
+                    }
+                }
+                break;
+            case 6:
+                if (jack && suitSize >= 4) {
+                    tricks += (suitSize - 3);
+                }
+                if (queen && suitSize >= 3) {
+                    tricks++;
+                }
+                if (king && suitSize >= 2) {
+                    tricks++;
+                }
+                if (ace) {
+                    tricks++;
+                }
+                if (!ace && !king && !queen && !jack && suitSize > 4) {
+                    tricks += (suitSize - 4);
+                } else if (ace || king || queen || jack) {
+                    if (suitSize >= 5 && masters == 2) {
+                        tricks += (suitSize - 4);
+                    }
+                }
+                break;
+            case 7:
+                if (queen && suitSize >= 3) {
+                    tricks++;
+                }
+                if (king && suitSize >= 2) {
+                    tricks++;
+                }
+                if (ace) {
+                    tricks++;
+                }
+                break;
+            default:
+                if (jack && suitSize >= 4) {
+                    tricks++;
+                }
+                if (queen && suitSize >= 3) {
+                    tricks++;
+                }
+                if (king && suitSize >= 2) {
+                    tricks++;
+                }
+                if (ace) {
+                    tricks++;
+                }
+                break;
+        }
+
+//        if (Case == 3) {
+//            tricks += suitSize;
+//        } else if (Case < 5 && Case != 3) {
+//            if (jack && suitSize >= 4) {
+//                tricks++;
+//            }
+//            if (queen && suitSize >= 3) {
+//                tricks++;
+//            }
+//            if (king && suitSize >= 2) {
+//                tricks++;
+//            }
+//            if (ace) {
+//                tricks++;
+//            }
+//        } else if (Case == 5) {
+//            if (masters == 2 && suitSize == 5) {
+//                if (ace && king) {
+//                    tricks += (suitSize - 1);
+//                } else {
+//                    tricks += (suitSize - 2);
+//                }
+//            } else if (masters > 2) {
+//                if (suitSize < 7) {
+//                    tricks += (suitSize - 1);
+//                } else {
+//                    tricks += suitSize;
+//                }
+//            }
+//        } else if (Case == 6) {
+//            if (jack && suitSize >= 4) {
+//                tricks += (suitSize - 3);
+//            }
+//            if (queen && suitSize >= 3) {
+//                tricks++;
+//            }
+//            if (king && suitSize >= 2) {
+//                tricks++;
+//            }
+//            if (ace) {
+//                tricks++;
+//            }
+//            if (!ace && !king && !queen && !jack && suitSize > 4) {
+//                tricks += (suitSize - 4);
+//            } else if (ace || king || queen || jack) {
+//                if (suitSize >= 5 && masters == 2) {
+//                    tricks += (suitSize - 4);
+//                }
+//            }
+//        }
+        return tricks;
+    }
+
+    public Call maxOpenBidding() {
+        Call c = new Call(true);
+
+        ArrayList<Integer> h = getHand();
+        ArrayList<Integer> masters = new ArrayList();
+        int aceCounter = 0;
+        int tricks = 0;
+        int highestTricks = 0;
+        int greatestMaster = 0;
+        int totalMasterPoints = 0;
+        String callSuit = "";
+        ArrayList<Integer> spades = new ArrayList();
+        ArrayList<Integer> spadeMasters = new ArrayList();
+        ArrayList<Integer> hearts = new ArrayList();
+        ArrayList<Integer> heartMasters = new ArrayList();
+        ArrayList<Integer> diamonds = new ArrayList();
+        ArrayList<Integer> diamondMasters = new ArrayList();
+        ArrayList<Integer> clubs = new ArrayList();
+        ArrayList<Integer> clubMasters = new ArrayList();
+        ArrayList<ArrayList> handSuits = new ArrayList<>(Arrays.asList(spades, hearts, diamonds, clubs));
+
+        for (int i = 0; i < h.size(); i++) { //Organize hand into suits
+            int card = h.get(i); //Get next card
+
+            if ((card - 1) / 13 == 0) { //Check if card is in the first 13 cards of the deck (Clubs)
+                clubs.add(card);
+                if (card % 13 == 0 || card % 13 == 12 || card % 13 == 11 || card % 13 == 10) {
+                    masters.add(card);
+                    clubMasters.add(card);
+                }
+            }
+            if ((card - 1) / 13 == 1) {
+                diamonds.add(card);
+                if (card % 13 == 0 || card % 13 == 12 || card % 13 == 11 || card % 13 == 10) {
+                    masters.add(card);
+                    diamondMasters.add(card);
+                }
+            }
+            if ((card - 1) / 13 == 2) {
+                hearts.add(card);
+                if (card % 13 == 0 || card % 13 == 12 || card % 13 == 11 || card % 13 == 10) {
+                    masters.add(card);
+                    heartMasters.add(card);
+                }
+            }
+            if ((card - 1) / 13 == 3) {
+                spades.add(card);
+                if (card % 13 == 0 || card % 13 == 12 || card % 13 == 11 || card % 13 == 10) {
+                    masters.add(card);
+                    spadeMasters.add(card);
                 }
             }
         }
 
-        return tricks;
+        for (int i = 0; i < masters.size(); i++) {
+            if (masters.get(i) % 13 == 0) {
+                greatestMaster = 13;
+                aceCounter++;
+                totalMasterPoints += 13;
+            } else if ((masters.get(i) % 13) > greatestMaster) {
+                greatestMaster = (masters.get(i) % 13);
+            }
+            totalMasterPoints += (masters.get(i) % 13);
+        }
+
+        for (int i = 0; i < 4; i++) {
+            ArrayList<Integer> temp = handSuits.get(i);
+            int suitTricks = 0;
+
+            //Rule 1: If the total amount of masters is greater than 4,
+            //        and the sum of the master points is greater than 42,
+            //        and the greatest master is higher than a Queen
+            if (masters.size() > 4 && totalMasterPoints > 42 && greatestMaster > 11) {
+//                System.out.println("\t\t\tRule 1");
+//                System.out.println(determineMaxSuitTricks(temp, 1));
+                tricks += determineMaxSuitTricks(temp, 1);
+                suitTricks = determineMaxSuitTricks(temp, 1);
+                if (determineMaxSuitTricks(temp, 1) > highestTricks) {
+                    highestTricks = determineMaxSuitTricks(temp, 1);
+                    callSuit = "Suns";
+                }
+//                continue;
+            }
+
+            //Rule 2: If the hand contains 4 Aces
+            if (aceCounter == 4 && masters.size() == 4) {
+//                System.out.println("\t\t\tRule 2");
+//                System.out.println((determineMaxSuitTricks(temp, 2)));
+                tricks += determineMaxSuitTricks(temp, 2);
+                suitTricks = determineMaxSuitTricks(temp, 2);
+                if (determineMaxSuitTricks(temp, 2) > highestTricks) {
+                    highestTricks = determineMaxSuitTricks(temp, 2);
+                    callSuit = "Suns";
+                }
+//                continue;
+            }
+
+            //Rule 3: If the suit contains a full house (Ace, King, Queen and Jack)
+            if (temp.equals(spades)) {
+                if (spadeMasters.size() == 4) {
+//                    System.out.println("\t\t\tRule 3");
+//                    System.out.println((determineMaxSuitTricks(temp, 3)));
+                    if (determineMaxSuitTricks(temp, 3) > suitTricks) {
+                        tricks -= suitTricks;
+                        tricks += determineMaxSuitTricks(temp, 3);
+                        suitTricks = determineMaxSuitTricks(temp, 3);
+                        if (determineMaxSuitTricks(temp, 3) > highestTricks) {
+                            highestTricks = determineMaxSuitTricks(temp, 3);
+                            callSuit = "Spades";
+                        }
+                    }
+//                    continue;
+                }
+            } else if (temp.equals(hearts)) {
+                if (heartMasters.size() == 4) {
+//                    System.out.println("\t\t\tRule 3");
+//                    System.out.println((determineMaxSuitTricks(temp, 3)));
+                    if (determineMaxSuitTricks(temp, 3) > suitTricks) {
+                        tricks -= suitTricks;
+                        tricks += determineMaxSuitTricks(temp, 3);
+                        suitTricks = determineMaxSuitTricks(temp, 3);
+                        if (determineMaxSuitTricks(temp, 3) > highestTricks) {
+                            highestTricks = determineMaxSuitTricks(temp, 3);
+                            callSuit = "Hearts";
+                        }
+                    }
+//                    continue;
+                }
+            } else if (temp.equals(diamonds)) {
+                if (diamondMasters.size() == 4) {
+//                    System.out.println("\t\t\tRule 3");
+//                    System.out.println((determineMaxSuitTricks(temp, 3)));
+                    if (determineMaxSuitTricks(temp, 3) > suitTricks) {
+                        tricks -= suitTricks;
+                        tricks += determineMaxSuitTricks(temp, 3);
+                        suitTricks = determineMaxSuitTricks(temp, 3);
+                        if (determineMaxSuitTricks(temp, 3) > highestTricks) {
+                            highestTricks = determineMaxSuitTricks(temp, 3);
+                            callSuit = "Diamonds";
+                        }
+                    }
+//                    continue;
+                }
+            } else {
+                if (clubMasters.size() == 4) {
+//                    System.out.println("\t\t\tRule 3");
+//                    System.out.println((determineMaxSuitTricks(temp, 3)));
+                    if (determineMaxSuitTricks(temp, 3) > suitTricks) {
+                        tricks -= suitTricks;
+                        tricks += determineMaxSuitTricks(temp, 3);
+                        suitTricks = determineMaxSuitTricks(temp, 3);
+                        if (determineMaxSuitTricks(temp, 3) > highestTricks) {
+                            highestTricks = determineMaxSuitTricks(temp, 3);
+                            callSuit = "Clubs";
+                        }
+                    }
+//                    continue;
+                }
+            }
+
+            //Rule 4: If a suit has more than 2 master cards,
+            //        and more than 4 cards,
+            //        and the total number of master cards in the hand is greater than 4
+            if (temp.equals(spades)) {
+                if (spadeMasters.size() > 2 && temp.size() > 4 && masters.size() > 4) {
+//                    System.out.println("\t\t\tRule 4");
+//                    System.out.println((determineMaxSuitTricks(temp, 4)));
+                    if (determineMaxSuitTricks(temp, 4) > suitTricks) {
+                        tricks -= suitTricks;
+                        tricks += determineMaxSuitTricks(temp, 4);
+                        suitTricks = determineMaxSuitTricks(temp, 4);
+                        if (determineMaxSuitTricks(temp, 4) > highestTricks) {
+                            highestTricks = determineMaxSuitTricks(temp, 4);
+                            callSuit = "Spades";
+                        }
+                    }
+//                    continue;
+                }
+            } else if (temp.equals(hearts)) {
+                if (heartMasters.size() > 2 && temp.size() > 4 && masters.size() > 4) {
+//                    System.out.println("\t\t\tRule 4");
+//                    System.out.println((determineMaxSuitTricks(temp, 4)));
+                    if (determineMaxSuitTricks(temp, 4) > suitTricks) {
+                        tricks -= suitTricks;
+                        tricks += determineMaxSuitTricks(temp, 4);
+                        suitTricks = determineMaxSuitTricks(temp, 4);
+                        if (determineMaxSuitTricks(temp, 4) > highestTricks) {
+                            highestTricks = determineMaxSuitTricks(temp, 4);
+                            callSuit = "Hearts";
+                        }
+                    }
+//                    continue;
+                }
+            } else if (temp.equals(diamonds)) {
+                if (diamondMasters.size() > 2 && temp.size() > 4 && masters.size() > 4) {
+//                    System.out.println("\t\t\tRule 4");
+//                    System.out.println((determineMaxSuitTricks(temp, 4)));
+                    if (determineMaxSuitTricks(temp, 4) > suitTricks) {
+                        tricks -= suitTricks;
+                        tricks += determineMaxSuitTricks(temp, 4);
+                        suitTricks = determineMaxSuitTricks(temp, 4);
+                        if (determineMaxSuitTricks(temp, 4) > highestTricks) {
+                            highestTricks = determineMaxSuitTricks(temp, 4);
+                            callSuit = "Diamonds";
+                        }
+                    }
+//                    continue;
+                }
+            } else {
+                if (clubMasters.size() > 2 && temp.size() > 4 && masters.size() > 4) {
+//                    System.out.println("\t\t\tRule 4");
+//                    System.out.println((determineMaxSuitTricks(temp, 4)));
+                    if (determineMaxSuitTricks(temp, 4) > suitTricks) {
+                        tricks -= suitTricks;
+                        tricks += determineMaxSuitTricks(temp, 4);
+                        suitTricks = determineMaxSuitTricks(temp, 4);
+                        if (determineMaxSuitTricks(temp, 4) > highestTricks) {
+                            highestTricks = determineMaxSuitTricks(temp, 4);
+                            callSuit = "Clubs";
+                        }
+                    }
+//                    continue;
+                }
+            }
+
+            //Rule 5: If a suit has two or more master cards,
+            //        and five or more cards
+            if (temp.equals(spades)) {
+                if (spadeMasters.size() >= 2 && temp.size() >= 5) {
+//                    System.out.println("\t\t\tRule 5");
+//                    System.out.println((determineMaxSuitTricks(temp, 5)));
+                    if (determineMaxSuitTricks(temp, 5) > suitTricks) {
+                        tricks -= suitTricks;
+                        tricks += determineMaxSuitTricks(temp, 5);
+                        if (determineMaxSuitTricks(temp, 5) > highestTricks) {
+                            highestTricks = determineMaxSuitTricks(temp, 5);
+                            callSuit = "Spades";
+                        }
+                    }
+                }
+            } else if (temp.equals(hearts)) {
+                if (heartMasters.size() >= 2 && temp.size() >= 5) {
+//                    System.out.println("\t\t\tRule 5");
+//                    System.out.println((determineMaxSuitTricks(temp, 5)));
+                    if (determineMaxSuitTricks(temp, 5) > suitTricks) {
+                        tricks -= suitTricks;
+                        tricks += determineMaxSuitTricks(temp, 5);
+                        if (determineMaxSuitTricks(temp, 5) > highestTricks) {
+                            highestTricks = determineMaxSuitTricks(temp, 5);
+                            callSuit = "Hearts";
+                        }
+                    }
+                }
+            } else if (temp.equals(diamonds)) {
+                if (diamondMasters.size() >= 2 && temp.size() >= 5) {
+//                    System.out.println("\t\t\tRule 5");
+//                    System.out.println((determineMaxSuitTricks(temp, 5)));
+                    if (determineMaxSuitTricks(temp, 5) > suitTricks) {
+                        tricks -= suitTricks;
+                        tricks += determineMaxSuitTricks(temp, 5);
+                        if (determineMaxSuitTricks(temp, 5) > highestTricks) {
+                            highestTricks = determineMaxSuitTricks(temp, 5);
+                            callSuit = "Diamonds";
+                        }
+                    }
+                }
+            } else {
+                if (clubMasters.size() >= 2 && temp.size() >= 5) {
+//                    System.out.println("\t\t\tRule 5");
+//                    System.out.println((determineMaxSuitTricks(temp, 5)));
+                    if (determineMaxSuitTricks(temp, 5) > suitTricks) {
+                        tricks -= suitTricks;
+                        tricks += determineMaxSuitTricks(temp, 5);
+                        if (determineMaxSuitTricks(temp, 5) > highestTricks) {
+                            highestTricks = determineMaxSuitTricks(temp, 5);
+                            callSuit = "Clubs";
+                        }
+                    }
+                }
+            }
+        }
+//        System.out.println(tricks + " " + callSuit);
+
+        if (tricks > 3) {
+            c = new Call(tricks, callSuit, false, new Player());
+        }
+
+        return c;
     }
 
     @Override
@@ -394,6 +890,10 @@ public class Computer extends Player {
                 c = new Call(tricks, callSuit, false, this);
                 System.out.println("Call is " + tricks + " " + callSuit);
                 getRound().setCall(c);
+            } else if (maxOpenBidding().isLargerThan(getRound().getCall())) {
+                c = maxOpenBidding();
+                System.out.println("Call is " + c.getTricks() + " " + c.getSuit());
+                getRound().setCall(c);
             }
         }
 
@@ -515,40 +1015,156 @@ public class Computer extends Player {
 
     @Override
     public Call secondRoundBidding(Call call) {
+        ArrayList<Integer> hand = getHand();
         int bid = 0;
-        Scanner sc = new Scanner(System.in);
+        ArrayList<Integer> spades = new ArrayList();
+        ArrayList<Integer> hearts = new ArrayList();
+        ArrayList<Integer> diamonds = new ArrayList();
+        ArrayList<Integer> clubs = new ArrayList();
+        HashMap<String, ArrayList> handSuits = new HashMap();
+        handSuits.put("Spades", spades);
+        handSuits.put("Hearts", hearts);
+        handSuits.put("Diamonds", diamonds);
+        handSuits.put("Clubs", clubs);
 
-        while (bid < 0 || bid > call.getTricks()) {
-            Random r = new Random();
-            bid = r.nextInt(call.getTricks());
+        for (Integer card : hand) {
+            //Organize hand into suits
+
+            if ((card - 1) / 13 == 0) { //Check if card is in the first 13 cards of the deck (Clubs)
+                clubs.add(card);
+            }
+            if ((card - 1) / 13 == 1) {
+                diamonds.add(card);
+            }
+            if ((card - 1) / 13 == 2) {
+                hearts.add(card);
+            }
+            if ((card - 1) / 13 == 3) {
+                spades.add(card);
+            }
+        }
+
+        switch (call.getSuit()) {
+            case "Suns":
+                for (HashMap.Entry handSuit : handSuits.entrySet()) {
+                    bid += determineMaxSuitTricks((ArrayList<Integer>) handSuit.getValue(), 1);
+                }
+                break;
+            default:
+                for (HashMap.Entry handSuit : handSuits.entrySet()) {
+                    if (handSuit.getKey().equals(call.getSuit())) { //if trump suit
+                        bid += determineMaxSuitTricks((ArrayList<Integer>) handSuit.getValue(), 6);
+                    } else {
+                        bid += determineMaxSuitTricks((ArrayList<Integer>) handSuit.getValue(), 7);
+                    }
+                }
+                break;
+        }
+
+        if (bid > call.getTricks()) {
+            bid = call.getTricks();
         }
 
         Call c = new Call(bid, this, call.getSuit());
         setCall(c);
-
+        translate();
+        System.out.println(bid + " tricks \n\n");
         return c;
     }
 
     @Override
     public Call secondRoundBidding(int limit, Call call) {
+        ArrayList<Integer> hand = getHand();
         int bid = 0;
-        Scanner sc = new Scanner(System.in);
+        Boolean retry = false;
+        ArrayList<Integer> spades = new ArrayList();
+        ArrayList<Integer> hearts = new ArrayList();
+        ArrayList<Integer> diamonds = new ArrayList();
+        ArrayList<Integer> clubs = new ArrayList();
+        HashMap<String, ArrayList> handSuits = new HashMap();
+        handSuits.put("Spades", spades);
+        handSuits.put("Hearts", hearts);
+        handSuits.put("Diamonds", diamonds);
+        handSuits.put("Clubs", clubs);
 
-        if (limit == 0) {
-            while (bid < 0 || bid > call.getTricks()) {
-                Random r = new Random();
-                bid = r.nextInt(call.getTricks());
+        for (Integer card : hand) {
+            //Organize hand into suits
+
+            if ((card - 1) / 13 == 0) { //Check if card is in the first 13 cards of the deck (Clubs)
+                clubs.add(card);
             }
-        } else {
-            while ((bid < 0 || bid > call.getTricks()) && bid != limit) {
-                Random r = new Random();
-                bid = r.nextInt(call.getTricks());
+            if ((card - 1) / 13 == 1) {
+                diamonds.add(card);
+            }
+            if ((card - 1) / 13 == 2) {
+                hearts.add(card);
+            }
+            if ((card - 1) / 13 == 3) {
+                spades.add(card);
+            }
+        }
+
+        switch (call.getSuit()) {
+            case "Suns":
+                for (HashMap.Entry handSuit : handSuits.entrySet()) {
+                    bid += determineSuitTricks((ArrayList<Integer>) handSuit.getValue(), 1);
+                }
+                break;
+            default:
+                for (HashMap.Entry handSuit : handSuits.entrySet()) {
+                    if (handSuit.getKey().equals(call.getSuit())) { //if trump suit
+                        bid += determineSuitTricks((ArrayList<Integer>) handSuit.getValue(), 6);
+                    } else {
+                        bid += determineSuitTricks((ArrayList<Integer>) handSuit.getValue(), 7);
+                    }
+                }
+                break;
+        }
+
+        switch (bid - limit) {
+            case -2:
+                bid++;
+                break;
+            case -1:
+                break;
+            case 0:
+                bid = 0;
+                switch (call.getSuit()) {
+                    case "Suns":
+                        for (HashMap.Entry handSuit : handSuits.entrySet()) {
+                            bid += determineMaxSuitTricks((ArrayList<Integer>) handSuit.getValue(), 1);
+                        }
+                        break;
+                    default:
+                        for (HashMap.Entry handSuit : handSuits.entrySet()) {
+                            if (handSuit.getKey().equals(call.getSuit())) { //if trump suit
+                                bid += determineMaxSuitTricks((ArrayList<Integer>) handSuit.getValue(), 6);
+                            } else {
+                                bid += determineMaxSuitTricks((ArrayList<Integer>) handSuit.getValue(), 7);
+                            }
+                        }
+                        break;
+                }
+                break;
+            case 1:
+                break;
+            case 2:
+                bid--;
+                break;
+        }
+
+        if (bid == limit) {
+            if (limit == call.getTricks()) {
+                bid--;
+            } else {
+                bid++;
             }
         }
 
         Call c = new Call(bid, this, call.getSuit());
         setCall(c);
-
+        translate();
+        System.out.println(bid + " tricks \n\n");
         return c;
     }
 }
