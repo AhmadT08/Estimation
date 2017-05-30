@@ -206,8 +206,11 @@ public class User extends Player {
 //                }
 //            }
 //        }
-        Call c = new Call(bid, this);
-        c.setSuit(getRound().getCall().getSuit());
+        
+        int risk = Math.abs((bid - limit) / 2);
+
+        Call c = new Call(bid, this, call.getSuit(), risk);
+//        c.setSuit(getRound().getCall().getSuit());
         setCall(c);
 
         return c;

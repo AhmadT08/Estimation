@@ -8,6 +8,7 @@ package estimation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,11 +20,7 @@ public class Round {
 
     private Session session;
     private Call call;
-    private Boolean times2 = false;
-    private Boolean times4 = false;
-    private Boolean times6 = false;
-    private Boolean times8 = false;
-    private int multiplier;
+    private int Multiplier;
     private ArrayList<Integer> lastHand = new ArrayList();
     private ArrayList<Integer> cardPool = new ArrayList();
     private ArrayList<Player> players = new ArrayList();
@@ -31,23 +28,7 @@ public class Round {
     public Round(int multiplier, ArrayList<Player> p, Session s, int cursor) {
         session = s;
         call = new Call(true);
-
-        if (multiplier == 2) {
-            times2 = true;
-            this.multiplier = multiplier;
-        } else if (multiplier == 4) {
-            times4 = true;
-            this.multiplier = multiplier;
-        } else if (multiplier == 6) {
-            times6 = true;
-            this.multiplier = multiplier;
-        } else if (multiplier == 8) {
-            times8 = true;
-            this.multiplier = multiplier;
-        } else {
-            this.multiplier = multiplier;
-        }
-
+        this.Multiplier = multiplier;
         players = p;
         deal(players);
         setPlayerRounds();
@@ -63,36 +44,11 @@ public class Round {
     }
 
     public int getMultiplier() {
-        return multiplier;
+        return Multiplier;
     }
 
     public void setMultiplier(int multiplier) {
-        if (multiplier == 2) {
-            times2 = true;
-            times4 = false;
-            times6 = false;
-            times8 = false;
-            this.multiplier = multiplier;
-        } else if (multiplier == 4) {
-            times2 = false;
-            times4 = true;
-            times6 = false;
-            times8 = false;
-            this.multiplier = multiplier;
-        } else if (multiplier == 6) {
-            times2 = false;
-            times4 = false;
-            times6 = true;
-            times8 = false;
-            this.multiplier = multiplier;
-        } else if (multiplier == 8) {
-            times2 = false;
-            times4 = false;
-            times6 = false;
-            times8 = true;
-            this.multiplier = multiplier;
-        }
-
+        this.Multiplier = multiplier;
     }
 
     public void translate(ArrayList<Integer> list) {
@@ -240,7 +196,7 @@ public class Round {
 //            }
 //        }
         if (passCounter == 4) {
-            session.RestartRound(multiplier + 2);
+            session.RestartRound(Multiplier);
         } else if (bidCalls.size() > 1) {
             x = raiseFold(bidCalls);
         } else {
@@ -439,19 +395,24 @@ public class Round {
             int first = players.get(cursor).playCard();
             hand.add(new Card(first, players.get(cursor)));
             cursor = nextCursor(cursor);
-
+            
             suit = Suit.returnSuitByCard(first);
+            
+            if(call.getSuit().equals("Suns")){
+                trumpSuit = suit;
+            }
 
             for (int j = 0; j < 3; j++) {
                 hand.add(new Card(players.get(cursor).playCard(suit, trumpSuit), players.get(cursor)));
                 cursor = nextCursor(cursor);
             }
-            Boolean b = false;
+            Boolean hasTrumpCard = false;
 
             for (int j = 0; j < 4; j++) {
                 if (trumpSuit.trumpCheck(hand.get(j).number)) {
-                    b = true;
-            }                }
+                    hasTrumpCard = true;
+                }
+            }
 
             ArrayList<Integer> handCards = new ArrayList();
 
@@ -459,7 +420,7 @@ public class Round {
                 handCards.add(hand.get(k).number);
             }
 
-            if (b) {
+            if (hasTrumpCard) {
                 Player p = determineHandWinner(trumpSuit.compareWeight(handCards, suit), hand);
                 cursor = players.indexOf(p);
             } else {
@@ -493,6 +454,138 @@ public class Round {
 
         start(players.indexOf(call.getCaller()));
         winLoss();
+        calculateScores();
     }
 
+    public void calculateScores() {
+        int multiplier;
+        int winners = 0;
+        int losers = 0;
+
+        if (Multiplier == 0) {
+            multiplier = 1;
+        } else {
+            multiplier = Multiplier;
+        }
+
+        for (Player p : players) {
+            if (p.getCall().getTricks() == p.getTricks()) {
+                winners++;
+            } else {
+                losers++;
+            }
+        }
+
+        if (winners == 0) {
+            session.RestartRound(multiplier + 2);
+        } else {
+            for (Player player : players) {
+                int predicted = player.getCall().getTricks();
+                int actual = player.getTricks();
+                int risk = player.getCall().getRisk() * 10;
+
+                if (player.getCall().isDashCall()) {
+                    if (actual == predicted) {
+                        if (winners == 1) {
+                            player.incrementScore((33 + 10) * multiplier);
+                        } else {
+                            player.incrementScore(33 * multiplier);
+                        }
+                    } else {
+                        if (losers == 1) {
+                            player.decrementScore((33 + 10) * multiplier);
+                        } else {
+                            player.decrementScore(33 * multiplier);
+                        }
+                    }
+                } else if (player.getCall().getTricks() == call.getTricks()) {
+                    if (actual == predicted) {
+                        if (actual > 7) {
+                            if (winners == 1) {
+                                player.incrementScore(((actual * actual) + 10 + risk) * multiplier);
+                            } else {
+                                player.incrementScore(((actual * actual) + risk) * multiplier);
+                            }
+                        } else if (actual <= 7) {
+                            if (winners == 1) {
+                                player.incrementScore(((23 + actual) + 10 + risk) * multiplier);
+                            } else {
+                                player.incrementScore((23 + actual + risk) * multiplier);
+                            }
+                        }
+                    } else {
+                        if (actual > 7) {
+                            if (losers == 1) {
+                                player.decrementScore((((actual * actual) / 2) + 10 + risk) * multiplier);
+                            } else {
+                                player.decrementScore((((actual * actual) / 2) + risk) * multiplier);
+                            }
+                        } else if (actual <= 7) {
+                            if (losers == 1) {
+                                player.decrementScore(((Math.abs(actual - predicted) + 10) + 10 + risk) * multiplier);
+                            } else {
+                                player.decrementScore(((Math.abs(actual - predicted) + 10) + risk) * multiplier);
+                            }
+                        }
+                    }
+                } else {
+                    if (actual == predicted) {
+                        if (winners == 1) {
+                            player.incrementScore(((13 + actual) + 10 + risk) * multiplier);
+                        } else {
+                            player.incrementScore(((13 + actual) + risk) * multiplier);
+                        }
+                    } else {
+                        if (losers == 1) {
+                            player.decrementScore((Math.abs(actual - predicted) + 10 + risk) * multiplier);
+                        } else {
+                            player.decrementScore((Math.abs(actual - predicted) + risk) * multiplier);
+                        }
+                    }
+                }
+            }
+        }
+        calculatePositions();
+//        HashMap<Player, Integer> positionMap = calculatePositions();
+        for (int i = 1; i < 5; i++) {
+            for (Player player : players) {
+                if (player.getPosition() == i) {
+                    System.out.println("Position " + i + ") " + player.getName() + " - " + player.getScore());
+                }
+            }
+        }
+    }
+
+    public void calculatePositions() {
+        HashMap<Player, Integer> positionMap = new HashMap();
+        Player[] playerArray = new Player[4];
+
+        for (int i = 0; i < 4; i++) {
+            playerArray[i] = players.get(i);
+        }
+
+        for (int i = 0; i < 4; i++) {
+            int position = 1;
+            for (int j = 0; j < 4; j++) {
+                if (playerArray[i].getScore() < playerArray[j].getScore()) {
+                    position++;
+                }
+            }
+            positionMap.put(playerArray[i], position);
+            playerArray[i].setPosition(position);
+        }
+        //if two players have the same score, this makes it so that they don't have the same position
+//        for (HashMap.Entry key1 : positionMap.entrySet()) {
+//            for (HashMap.Entry key2 : positionMap.entrySet()) {
+//                if (!key1.equals(key2)) {
+//                    if (key1.getValue().equals(key2.getValue())) {
+//                        key2.setValue((int) key2.getValue() - 1);
+//                    }
+//                }
+//            }
+//            Player p = (Player) key1.getKey();
+//            p.setPosition((int) key1.getValue());
+//        }
+//        return positionMap;
+    }
 }

@@ -869,16 +869,16 @@ public class Estimation {
 
 //        System.out.println(suitPoints(suit));
         User u1 = new User("Ahmad");
-//        User u2 = new User("Negm");
-//        User u3 = new User("Ramy");
-//        User u4 = new User("Helal");
+        User u2 = new User("Negm");
+        User u3 = new User("Ramy");
+        User u4 = new User("Helal");
 //
-        Computer c1 = new Computer("Computer1");
-        Computer c2 = new Computer("Computer2");
-        Computer c3 = new Computer("Computer3");
-        Computer c4 = new Computer("Computer4");
+//        Computer c1 = new Computer("Computer1");
+//        Computer c2 = new Computer("Computer2");
+//        Computer c3 = new Computer("Computer3");
+//        Computer c4 = new Computer("Computer4");
 
-        Session s1 = new Session(u1, c2, c3, c4, "Easy");
+        Session s1 = new Session(u1, u2, u3, u4, "Easy");
     }
 
 }

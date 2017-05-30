@@ -19,11 +19,12 @@ public class Call {
     private Boolean dashCall;
     private Boolean pass;
     private Player caller;
+    private int risk = 0;
     private static ArrayList<String> suitRanking = new ArrayList<>(Arrays.asList("Clubs", "Diamonds", "Hearts", "Spades", "Suns"));
 
     public Call(int tricks, String suit, Boolean dashcall, Player p) {
         this.tricks = tricks;
-        
+
         switch (suit) {
             case "Clubs":
                 this.suit = new Clubs();
@@ -35,18 +36,18 @@ public class Call {
                 this.suit = new Hearts();
                 break;
             case "Spades":
-                this.suit = new Spades(); 
+                this.suit = new Spades();
                 break;
             case "Suns":
                 this.suit = new Suns();
                 break;
         }
-        
+
         pass = false;
+        this.dashCall = dashcall;
         if (tricks > 0) {
             this.dashCall = false;
         }
-        this.dashCall = dashcall;
         caller = p;
     }
 
@@ -55,7 +56,7 @@ public class Call {
         dashCall = false;
         pass = false;
         caller = p;
-        
+
         switch (suit) {
             case "Clubs":
                 this.suit = new Clubs();
@@ -75,6 +76,32 @@ public class Call {
         }
     }
     
+    public Call(int tricks, Player p, String suit, int risk) {
+        this.tricks = tricks;
+        dashCall = false;
+        pass = false;
+        caller = p;
+        this.risk = risk;
+
+        switch (suit) {
+            case "Clubs":
+                this.suit = new Clubs();
+                break;
+            case "Diamonds":
+                this.suit = new Diamonds();
+                break;
+            case "Hearts":
+                this.suit = new Hearts();
+                break;
+            case "Spades":
+                this.suit = new Spades();
+                break;
+            case "Suns":
+                this.suit = new Suns();
+                break;
+        }
+    }
+
     public Call(int tricks, Player p) {
         this.tricks = tricks;
         dashCall = false;
@@ -88,8 +115,8 @@ public class Call {
         pass = true;
         caller = p;
     }
-    
-    public Call(Boolean p){
+
+    public Call(Boolean p) {
         tricks = 0;
         dashCall = false;
         pass = true;
@@ -105,6 +132,10 @@ public class Call {
 
     public String getSuit() {
         return suit.getName();
+    }
+    
+    public int getRisk(){
+        return risk;
     }
 
     public void setSuit(String suit) {
@@ -131,17 +162,17 @@ public class Call {
         return dashCall;
     }
 
-    public Boolean isPassed(){
+    public Boolean isPassed() {
         return pass;
     }
-    
-    public Player getCaller(){
+
+    public Player getCaller() {
         return caller;
     }
-    
+
     public String returnLargerSuit(String x, String y) {
         //returns the larger of the two suits
-        
+
         String result = "";
 
         int x1, y1;

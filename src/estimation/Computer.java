@@ -1158,8 +1158,10 @@ public class Computer extends Player {
                 bid++;
             }
         }
-
-        Call c = new Call(bid, this, call.getSuit());
+        
+        int risk = Math.abs((bid - limit)/2);
+        
+        Call c = new Call(bid, this, call.getSuit(),risk);
         setCall(c);
         translate();
         System.out.println(bid + " tricks \n\n");

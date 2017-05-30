@@ -16,6 +16,7 @@ import java.util.Collections;
 public class Session {
     
     private int dealer = 0;
+    private int multiplier;
     private Round r;
     private int roundNumber;
     private ArrayList<Round> roundList = new ArrayList();
@@ -28,14 +29,15 @@ public class Session {
         players.add(p3);
         players.add(p4);
         this.difficulty = difficulty;
+        this.multiplier = 0;
         Start();
     }
     
     public void Start() {
         setPlayerSession();
         roundNumber = 1;
-        r = new Round(1, players, this, dealer);
-        clearPlayerHands();
+        r = new Round(0, players, this, dealer);
+        clearPlayerState();
     }
     
     public void setPlayerSession() {
@@ -45,25 +47,26 @@ public class Session {
     }
     
     public void RestartRound(int multi) {
-        System.out.println("All players passed, round restarted");
-        clearPlayerHands();
-        r = new Round(multi, players, this, dealer);
+        System.out.println("Round restarted");
+        clearPlayerState();
+        r = new Round(multi + 2, players, this, dealer);
     }
     
-    public void nextRound() {
+    public void nextRound(int multi) {
         roundNumber++;
         if (dealer == 3) {
             dealer = 0;
         } else {
             dealer++;
         }
-        clearPlayerHands();
-        r = new Round(1, players, this, dealer);
+        clearPlayerState();
+        r = new Round(multi, players, this, dealer);
     }
     
-    public void clearPlayerHands() {
+    public void clearPlayerState() {
         for (Player p : players) {
             p.clearHand();
+            p.clearTricks();
         }
     }
     
