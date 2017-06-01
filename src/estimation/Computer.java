@@ -1074,7 +1074,6 @@ public class Computer extends Player {
     public Call secondRoundBidding(int limit, Call call) {
         ArrayList<Integer> hand = getHand();
         int bid = 0;
-        Boolean retry = false;
         ArrayList<Integer> spades = new ArrayList();
         ArrayList<Integer> hearts = new ArrayList();
         ArrayList<Integer> diamonds = new ArrayList();
@@ -1158,18 +1157,170 @@ public class Computer extends Player {
                 bid++;
             }
         }
-        
-        int risk = Math.abs((bid - limit)/2);
-        
-        Call c = new Call(bid, this, call.getSuit(),risk);
+
+        int risk = Math.abs((bid - limit) / 2);
+
+        Call c = new Call(bid, this, call.getSuit(), risk);
         setCall(c);
         translate();
         System.out.println(bid + " tricks \n\n");
         return c;
     }
-    
+
     @Override
-    public int playCard(){
+    public Call fastBidding(Suit suit) {
+        ArrayList<Integer> hand = getHand();
+        int bid = 0;
+        ArrayList<Integer> spades = new ArrayList();
+        ArrayList<Integer> hearts = new ArrayList();
+        ArrayList<Integer> diamonds = new ArrayList();
+        ArrayList<Integer> clubs = new ArrayList();
+        HashMap<String, ArrayList> handSuits = new HashMap();
+        handSuits.put("Spades", spades);
+        handSuits.put("Hearts", hearts);
+        handSuits.put("Diamonds", diamonds);
+        handSuits.put("Clubs", clubs);
+
+        for (Integer card : hand) {
+            //Organize hand into suits
+
+            if ((card - 1) / 13 == 0) { //Check if card is in the first 13 cards of the deck (Clubs)
+                clubs.add(card);
+            }
+            if ((card - 1) / 13 == 1) {
+                diamonds.add(card);
+            }
+            if ((card - 1) / 13 == 2) {
+                hearts.add(card);
+            }
+            if ((card - 1) / 13 == 3) {
+                spades.add(card);
+            }
+        }
+
+        switch (suit.getName()) {
+            case "Suns":
+                for (HashMap.Entry handSuit : handSuits.entrySet()) {
+                    bid += determineMaxSuitTricks((ArrayList<Integer>) handSuit.getValue(), 1);
+                }
+                break;
+            default:
+                for (HashMap.Entry handSuit : handSuits.entrySet()) {
+                    if (handSuit.getKey().equals(suit.getName())) { //if trump suit
+                        bid += determineMaxSuitTricks((ArrayList<Integer>) handSuit.getValue(), 6);
+                    } else {
+                        bid += determineMaxSuitTricks((ArrayList<Integer>) handSuit.getValue(), 7);
+                    }
+                }
+                break;
+        }
+
+        Call c = new Call(bid, this, suit.getName());
+        setCall(c);
+        translate();
+        System.out.println(bid + " " + suit.getName() + "\n\n");
+        return c;
+    }
+
+    @Override
+    public Call fastBidding(Suit suit, int limit) {
+        ArrayList<Integer> hand = getHand();
+        int bid = 0;
+        ArrayList<Integer> spades = new ArrayList();
+        ArrayList<Integer> hearts = new ArrayList();
+        ArrayList<Integer> diamonds = new ArrayList();
+        ArrayList<Integer> clubs = new ArrayList();
+        HashMap<String, ArrayList> handSuits = new HashMap();
+        handSuits.put("Spades", spades);
+        handSuits.put("Hearts", hearts);
+        handSuits.put("Diamonds", diamonds);
+        handSuits.put("Clubs", clubs);
+
+        for (Integer card : hand) {
+            //Organize hand into suits
+
+            if ((card - 1) / 13 == 0) { //Check if card is in the first 13 cards of the deck (Clubs)
+                clubs.add(card);
+            }
+            if ((card - 1) / 13 == 1) {
+                diamonds.add(card);
+            }
+            if ((card - 1) / 13 == 2) {
+                hearts.add(card);
+            }
+            if ((card - 1) / 13 == 3) {
+                spades.add(card);
+            }
+        }
+
+        switch (suit.getName()) {
+            case "Suns":
+                for (HashMap.Entry handSuit : handSuits.entrySet()) {
+                    bid += determineSuitTricks((ArrayList<Integer>) handSuit.getValue(), 1);
+                }
+                break;
+            default:
+                for (HashMap.Entry handSuit : handSuits.entrySet()) {
+                    if (handSuit.getKey().equals(suit.getName())) { //if trump suit
+                        bid += determineSuitTricks((ArrayList<Integer>) handSuit.getValue(), 6);
+                    } else {
+                        bid += determineSuitTricks((ArrayList<Integer>) handSuit.getValue(), 7);
+                    }
+                }
+                break;
+        }
+
+        switch (bid - limit) {
+            case -2:
+                bid++;
+                break;
+            case -1:
+                break;
+            case 0:
+                bid = 0;
+                switch (suit.getName()) {
+                    case "Suns":
+                        for (HashMap.Entry handSuit : handSuits.entrySet()) {
+                            bid += determineMaxSuitTricks((ArrayList<Integer>) handSuit.getValue(), 1);
+                        }
+                        break;
+                    default:
+                        for (HashMap.Entry handSuit : handSuits.entrySet()) {
+                            if (handSuit.getKey().equals(suit.getName())) { //if trump suit
+                                bid += determineMaxSuitTricks((ArrayList<Integer>) handSuit.getValue(), 6);
+                            } else {
+                                bid += determineMaxSuitTricks((ArrayList<Integer>) handSuit.getValue(), 7);
+                            }
+                        }
+                        break;
+                }
+                break;
+            case 1:
+                break;
+            case 2:
+                bid--;
+                break;
+        }
+
+        if (bid == limit) {
+            if (limit == 0) {
+                bid++;
+            } else {
+                bid--;
+            }
+        }
+
+        int risk = Math.abs((bid - limit) / 2);
+
+        Call c = new Call(bid, this, suit.getName(), risk);
+        setCall(c);
+        translate();
+        System.out.println(bid + " tricks \n\n");
+        return c;
+    }
+
+    @Override
+    public int playCard() {
         return 0;
     }
 }

@@ -6,11 +6,7 @@
 package estimation;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  *
@@ -18,21 +14,36 @@ import java.util.Set;
  */
 public class Round {
 
-    private Session session;
+    private final Session session;
     private Call call;
     private int Multiplier;
-    private ArrayList<Integer> lastHand = new ArrayList();
-    private ArrayList<Integer> cardPool = new ArrayList();
+    private int dealer;
+    private final int roundNumber;
+    private ArrayList<Card> lastHand = new ArrayList();
+    private ArrayList<Call> roundCalls = new ArrayList();
+//    private ArrayList<Integer> cardPool = new ArrayList();
     private ArrayList<Player> players = new ArrayList();
+    private Boolean restart = false;
 
-    public Round(int multiplier, ArrayList<Player> p, Session s, int cursor) {
-        session = s;
+    public Round(int multiplier, ArrayList<Player> p, Session sesh, int rn) {
+        session = sesh;
         call = new Call(true);
         this.Multiplier = multiplier;
         players = p;
+        roundNumber = rn;
+    }
+
+    public void startRound(int cursor) {
+        dealer = cursor;
         deal(players);
         setPlayerRounds();
-        initiateBidding(cursor);
+        startBidding(cursor);
+        startPlay(players.indexOf(call.getCaller()));
+        winLoss();
+        calculateScores();
+        if (!restart) {
+            session.nextRound(this);
+        }
     }
 
     public Call getCall() {
@@ -49,6 +60,10 @@ public class Round {
 
     public void setMultiplier(int multiplier) {
         this.Multiplier = multiplier;
+    }
+
+    public int getRoundNumber() {
+        return roundNumber;
     }
 
     public void translate(ArrayList<Integer> list) {
@@ -146,6 +161,7 @@ public class Round {
                 break;                            //the score multiplier increases by 2
             } else {
                 if (players.get(cursor).dashCall()) {
+                    roundCalls.add(players.get(cursor).getCall());
                     dashCounter++;
                     System.out.println(players.get(cursor).name + " Dash call!");
                 }
@@ -162,7 +178,6 @@ public class Round {
         int passCounter = 0;
         Call x = new Call(true);
 
-        ArrayList<Call> calls = new ArrayList();
         ArrayList<Call> bidCalls = new ArrayList();
 
         while (i < 4) {
@@ -172,7 +187,8 @@ public class Round {
                 i++;
             } else {
                 Call c = players.get(cursor).openBidding();
-                calls.add(c);
+
+                roundCalls.add(c);
 
                 if (c.isPassed()) {
                     passCounter++;
@@ -186,21 +202,19 @@ public class Round {
             }
         }
 
-//        if (passCounter == 4) {
-//            session.RestartRound(multiplier + 2);
-//        } else {
-//            for (int j = 0; j < calls.size(); j++) {
-//                if (!calls.get(j).isPassed()) {
-//                    x = calls.get(j);
-//                }
-//            }
-//        }
         if (passCounter == 4) {
             session.RestartRound(Multiplier);
+            restart = true;
         } else if (bidCalls.size() > 1) {
             x = raiseFold(bidCalls);
         } else {
             x = bidCalls.get(0);
+        }
+
+        for (int j = 0; j < 4; j++) {
+            if (roundCalls.get(j).getCaller().equals(x.getCaller())) {
+                roundCalls.set(j, x);
+            }
         }
 
         return x;
@@ -283,6 +297,16 @@ public class Round {
         return cursor;
     }
 
+    public int previousCursor(int cursor) {
+        if (cursor == 0) {
+            cursor = 3;
+        } else {
+            cursor--;
+        }
+
+        return cursor;
+    }
+
     public int getSumOfBids() {
         int sum = 0;
 
@@ -296,49 +320,79 @@ public class Round {
     public void secondRoundBids(int cursor) {
         int lastBidder;
 
-        for (int i = 0; i < 4; i++) {
-            if (players.get(i) != call.getCaller()) {
-                if (!players.get(i).getCall().isDashCall()) {
-                    players.get(i).setCall(new Call(true));
+        if (roundNumber < 14) {
+            for (int i = 0; i < 4; i++) {
+                if (players.get(i) != call.getCaller()) {
+                    if (!players.get(i).getCall().isDashCall()) {
+                        players.get(i).setCall(new Call(true));
+                    }
                 }
             }
-        }
 
-        if (players.get(nextCursor(nextCursor(cursor))).getCall().isDashCall()) {
-            lastBidder = nextCursor(cursor);
-        } else if (players.get(nextCursor(nextCursor(cursor))).getCall().isDashCall()
-                && players.get(nextCursor(cursor)).getCall().isDashCall()) {
-            lastBidder = cursor;
-        } else {
-            lastBidder = nextCursor(nextCursor(cursor));
-        }
+            if (players.get(nextCursor(nextCursor(cursor))).getCall().isDashCall()) {
+                lastBidder = nextCursor(cursor);
+            } else if (players.get(nextCursor(nextCursor(cursor))).getCall().isDashCall()
+                    && players.get(nextCursor(cursor)).getCall().isDashCall()) {
+                lastBidder = cursor;
+            } else {
+                lastBidder = nextCursor(nextCursor(cursor));
+            }
 
-        int i = 0;
+            int i = 0;
 
-        while (i < 3) {
-            if (!players.get(cursor).getCall().isDashCall()) {
-                if (cursor == lastBidder) {
+            while (i < 3) {
+                if (!players.get(cursor).getCall().isDashCall()) {
+                    if (cursor == lastBidder) {
 
-                    if (getSumOfBids() > 13) {
-                        players.get(cursor).secondRoundBidding(call.getTricks(), call);
-                    } else if (getSumOfBids() < 13) {
-                        players.get(cursor).secondRoundBidding(13 - getSumOfBids(), call);
+                        if (getSumOfBids() > 13) {
+                            players.get(cursor).secondRoundBidding(call.getTricks(), call);
+                        } else if (getSumOfBids() < 13) {
+                            players.get(cursor).secondRoundBidding(13 - getSumOfBids(), call);
+                        } else {
+                            players.get(cursor).secondRoundBidding(0, call);
+                        }
+
                     } else {
-                        players.get(cursor).secondRoundBidding(0, call);
+                        players.get(cursor).secondRoundBidding(call);
                     }
 
+                    cursor = nextCursor(cursor);
+
+                    i++;
                 } else {
-                    players.get(cursor).secondRoundBidding(call);
+                    cursor = nextCursor(cursor);
+                    i++;
+                }
+            }
+        } else if (roundNumber >= 14) {
+
+            lastBidder = previousCursor(cursor);
+            Suit[] fastBiddingSuits = {new Suns(), new Spades(), new Hearts(), new Diamonds(), new Clubs()};
+            Suit currentSuit = fastBiddingSuits[roundNumber - 14];
+
+            System.out.println("Round " + roundNumber + ": Trump Suit [" + currentSuit.getName() + "]");
+
+            int i = 0;
+
+            while (i < 4) {
+                if (cursor == lastBidder) {
+                    if (getSumOfBids() > 13) {
+                        players.get(cursor).fastBidding(currentSuit, 13);
+                    } else if (getSumOfBids() < 13) {
+                        players.get(cursor).fastBidding(currentSuit, 13 - getSumOfBids());
+                    } else {
+                        players.get(cursor).fastBidding(currentSuit, 0);
+                    }
+                } else {
+                    players.get(cursor).fastBidding(currentSuit);
                 }
 
-                cursor = nextCursor(cursor);
-
-                i++;
-            } else {
+                roundCalls.add(players.get(cursor).getCall());
                 cursor = nextCursor(cursor);
                 i++;
             }
         }
+
     }
 
     public String suitChecker(int card) {
@@ -382,11 +436,11 @@ public class Round {
         }
     }
 
-    public void start(int cursor) {
+    public void startPlay(int cursor) {
         System.out.println("Round has started. " + call.getCaller().getName() + " starts.");
 
         ArrayList<Card> hand = new ArrayList();
-        ArrayList<Player> cardPlayers = new ArrayList();
+//        ArrayList<Player> cardPlayers = new ArrayList();
 
         Suit trumpSuit = Suit.returnSuitByName(call.getSuit());
         Suit suit;
@@ -395,10 +449,10 @@ public class Round {
             int first = players.get(cursor).playCard();
             hand.add(new Card(first, players.get(cursor)));
             cursor = nextCursor(cursor);
-            
+
             suit = Suit.returnSuitByCard(first);
-            
-            if(call.getSuit().equals("Suns")){
+
+            if (call.getSuit().equals("Suns")) {
                 trumpSuit = suit;
             }
 
@@ -428,33 +482,61 @@ public class Round {
                 cursor = players.indexOf(p);
             }
 
+            lastHand = hand;
             hand.clear();
         }
     }
 
-    public void initiateBidding(int cursor) {
-        dashCall(cursor);
-        call = collectBids(cursor);
-        call.getCaller().setCaller(true);
+    public void startBidding(int cursor) {
+        if (roundNumber < 14) {
+            dashCall(cursor);
+            call = collectBids(cursor);
+            if (!restart) {
+                call.getCaller().setCaller(true);
 
-        for (Player p : players) {
-            if (!p.isCaller()) {
-                p.getCall().setSuit(call.getSuit());
-                p.clearTricks();
+                for (Player p : players) {
+                    if (!p.isCaller()) {
+                        p.getCall().setSuit(call.getSuit());
+                        p.clearTricks();
+                    }
+                }
+
+                secondRoundBids(nextCursor(players.indexOf(call.getCaller())));
+
+                if (getSumOfBids() > 13) {
+                    System.out.println("Total bids = " + getSumOfBids() + "\nGame state = over " + (getSumOfBids() - 13) + "\n");
+                } else {
+                    System.out.println("Total bids = " + getSumOfBids() + "\nGame state = under " + (13 - getSumOfBids()) + "\n");
+                }
+            }
+        } else if (roundNumber >= 14) {
+            secondRoundBids(cursor);
+
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++) {
+                    if (roundCalls.get(i).getTricks() > roundCalls.get(j).getTricks()) {
+                        if (i > j) {
+                            Call temp = roundCalls.get(j);
+                            roundCalls.set(j, roundCalls.get(i));
+                            roundCalls.set(i, temp);
+                        }
+                    }
+                }
+            }
+            
+            if(roundCalls.get(0).getTricks() == roundCalls.get(2).getTricks()){
+                Multiplier += 2;
+            }
+
+            call = roundCalls.get(0);
+            call.getCaller().setCaller(true);
+
+            if (getSumOfBids() > 13) {
+                System.out.println("Total bids = " + getSumOfBids() + "\nGame state = over " + (getSumOfBids() - 13) + "\n");
+            } else {
+                System.out.println("Total bids = " + getSumOfBids() + "\nGame state = under " + (13 - getSumOfBids()) + "\n");
             }
         }
-
-        secondRoundBids(nextCursor(players.indexOf(call.getCaller())));
-
-        if (getSumOfBids() > 13) {
-            System.out.println("Total bids = " + getSumOfBids() + "\nGame state = over " + (getSumOfBids() - 13) + "\n");
-        } else {
-            System.out.println("Total bids = " + getSumOfBids() + "\nGame state = under " + (13 - getSumOfBids()) + "\n");
-        }
-
-        start(players.indexOf(call.getCaller()));
-        winLoss();
-        calculateScores();
     }
 
     public void calculateScores() {
@@ -478,6 +560,7 @@ public class Round {
 
         if (winners == 0) {
             session.RestartRound(multiplier + 2);
+            restart = true;
         } else {
             for (Player player : players) {
                 int predicted = player.getCall().getTricks();
@@ -544,20 +627,21 @@ public class Round {
                     }
                 }
             }
-        }
-        calculatePositions();
-//        HashMap<Player, Integer> positionMap = calculatePositions();
-        for (int i = 1; i < 5; i++) {
-            for (Player player : players) {
-                if (player.getPosition() == i) {
-                    System.out.println("Position " + i + ") " + player.getName() + " - " + player.getScore());
+            calculatePositions();
+
+            for (int i = 0; i < 4; i++) {
+                for (Player player : players) {
+                    if (player.getPosition() == i) {
+                        System.out.println("Position " + (i + 1) + ") " + player.getName() + " - " + player.getScore());
+                    }
                 }
             }
         }
+
     }
 
     public void calculatePositions() {
-        HashMap<Player, Integer> positionMap = new HashMap();
+        //bubble sort
         Player[] playerArray = new Player[4];
 
         for (int i = 0; i < 4; i++) {
@@ -565,27 +649,19 @@ public class Round {
         }
 
         for (int i = 0; i < 4; i++) {
-            int position = 1;
             for (int j = 0; j < 4; j++) {
-                if (playerArray[i].getScore() < playerArray[j].getScore()) {
-                    position++;
+                if (playerArray[i].getScore() > playerArray[j].getScore()) {
+                    if (i > j) {
+                        Player temp = playerArray[j];
+                        playerArray[j] = playerArray[i];
+                        playerArray[i] = temp;
+                    }
                 }
             }
-            positionMap.put(playerArray[i], position);
-            playerArray[i].setPosition(position);
         }
-        //if two players have the same score, this makes it so that they don't have the same position
-//        for (HashMap.Entry key1 : positionMap.entrySet()) {
-//            for (HashMap.Entry key2 : positionMap.entrySet()) {
-//                if (!key1.equals(key2)) {
-//                    if (key1.getValue().equals(key2.getValue())) {
-//                        key2.setValue((int) key2.getValue() - 1);
-//                    }
-//                }
-//            }
-//            Player p = (Player) key1.getKey();
-//            p.setPosition((int) key1.getValue());
-//        }
-//        return positionMap;
+
+        for (int i = 0; i < 4; i++) {
+            playerArray[i].setPosition(i);
+        }
     }
 }

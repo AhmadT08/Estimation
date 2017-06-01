@@ -59,8 +59,8 @@ public class Player {
     public void addTrick() {
         tricks++;
     }
-    
-    public void clearTricks(){
+
+    public void clearTricks() {
         tricks = 0;
     }
 
@@ -184,7 +184,7 @@ public class Player {
 
     public String translate(int card) {
         String x = "";
-        
+
         if ((card - 1) / 13 == 0) { //Check if card is in the first 13 cards of the deck (Clubs)
             if (card % 13 == 0) {
                 x = "Ace of Clubs"; //The ace is the 13th card in the suit
@@ -237,7 +237,7 @@ public class Player {
                 x = ((card % 13) + 1) + " of Spades";
             }
         }
-        
+
         return x;
     }
 
@@ -352,9 +352,9 @@ public class Player {
 
         return b;
     }
-    
-    public Boolean isAvoid(String suit){
-        Boolean b = false;        
+
+    public Boolean isAvoid(String suit) {
+        Boolean b = false;
 
         ArrayList<Integer> h = getHand();
         ArrayList<Integer> spades = new ArrayList();
@@ -380,27 +380,27 @@ public class Player {
 
         switch (suit) {
             case "Clubs":
-                if(clubs.isEmpty()){
+                if (clubs.isEmpty()) {
                     b = true;
                 }
                 break;
             case "Diamonds":
-                if(diamonds.isEmpty()){
+                if (diamonds.isEmpty()) {
                     b = true;
                 }
                 break;
             case "Hearts":
-                if(hearts.isEmpty()){
+                if (hearts.isEmpty()) {
                     b = true;
                 }
                 break;
             case "Spades":
-                if(spades.isEmpty()){
+                if (spades.isEmpty()) {
                     b = true;
                 }
                 break;
         }
-        
+
         return b;
     }
 
@@ -492,23 +492,29 @@ public class Player {
     public Call secondRoundBidding(Call call) {
         //initiates second round of bidding for when the player is not on the caller's left
 
-        Call c1 = new Call(true);
-        return c1;
+        return new Call(true);
     }
 
     public Call secondRoundBidding(int limit, Call call) {
         //initiates second round of bidding for when the player is on the caller's left
         //this method takes into account that the total sum of all bids cannot equal 13
 
-        Call c1 = new Call(true);
-        return c1;
+        return new Call(true);
+    }
+
+    public Call fastBidding(Suit suit) {
+        return new Call(true);
+    }
+
+    public Call fastBidding(Suit suit, int limit) {
+        return new Call(true);
     }
 
     public int playCard() {
         return 0;
     }
-    
-    public int playCard(Suit suit, Suit trumpSuit){
+
+    public int playCard(Suit suit, Suit trumpSuit) {
         return 0;
     }
 

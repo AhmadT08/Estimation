@@ -171,46 +171,70 @@ public class User extends Player {
             }
         }
 
-//        if (limit == 0) {
-//            while (b) {
-//                if (bid < 0 || bid > call.getTricks()) {
-//                    bid = limit;
-//                    System.out.println();
-//
-//                    while (bid == limit) {
-//                        System.out.println("Make a bid greater than " + limit + " and less than or equal to " + call.getTricks());
-//
-//                        try {
-//                            bid = Integer.parseInt(sc.nextLine());
-//                        } catch (Exception E) {
-//                            System.out.println("Please enter a number");
-//                        }
-//                    }
-//                } else {
-//                    b = false;
-//                }
-//            }
-//        } else {
-//            while (bid < 0 || bid > call.getTricks()) {
-//                bid = limit;
-//
-//                while (bid == limit) {
-//
-//                    System.out.println("Make a bid not equal to " + limit + " and less than or equal to " + call.getTricks());
-//
-//                    try {
-//                        bid = Integer.parseInt(sc.nextLine());
-//                    } catch (Exception E) {
-//                        System.out.println("Please enter a number");
-//                    }
-//                }
-//            }
-//        }
-        
         int risk = Math.abs((bid - limit) / 2);
 
         Call c = new Call(bid, this, call.getSuit(), risk);
 //        c.setSuit(getRound().getCall().getSuit());
+        setCall(c);
+
+        return c;
+    }
+
+    @Override
+    public Call fastBidding(Suit suit) {
+        System.out.println("\n" + name + "\n");
+        translate();
+
+        int bid = -1;
+        Scanner sc = new Scanner(System.in);
+
+        Boolean b = true;
+        while (b) {
+            if (bid < 0 || bid > 13) {
+                System.out.println("Make a bid between 0 and 13");
+
+                try {
+                    bid = Integer.parseInt(sc.nextLine());
+                } catch (Exception E) {
+                    System.out.println("Please enter a number");
+                }
+            } else {
+                b = false;
+            }
+        }
+
+        Call c = new Call(bid, this, suit.getName());
+        setCall(c);
+
+        return c;
+    }
+
+    @Override
+    public Call fastBidding(Suit suit, int limit) {
+        //players estimate how many tricks they can get given the call
+        //for the last player bidding
+        //bid must not be equal to the limit
+
+        System.out.println("\n" + name);
+
+        int bid = -1;
+        Scanner sc = new Scanner(System.in);
+
+//        Boolean b = true;
+        while (!inRange(bid, limit)) {
+
+            System.out.println("Make a bid between 0 and 13 and not equal to " + limit);
+
+            try {
+                bid = Integer.parseInt(sc.nextLine());
+            } catch (Exception E) {
+                System.out.println("Please enter a number");
+            }
+        }
+
+        int risk = Math.abs((bid - limit) / 2);
+
+        Call c = new Call(bid, this, suit.getName(), risk);
         setCall(c);
 
         return c;
@@ -342,6 +366,22 @@ public class User extends Player {
                 range.add(i);
             }
 
+        }
+
+        if (range.contains(bid)) {
+            b = true;
+        }
+        return b;
+    }
+
+    public Boolean inRange(int bid, int limit) {
+        Boolean b = false;
+        ArrayList<Integer> range = new ArrayList();
+
+        for (int i = 0; i < 13; i++) {
+            if (i != limit) {
+                range.add(i);
+            }
         }
 
         if (range.contains(bid)) {

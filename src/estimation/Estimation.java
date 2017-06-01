@@ -8,6 +8,7 @@ package estimation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -179,8 +180,8 @@ public class Estimation {
 
         return tricks;
     }
-    
-    public static int determineSuitTricks(ArrayList<Integer> suit, int Case){
+
+    public static int determineSuitTricks(ArrayList<Integer> suit, int Case) {
         int tricks, suitSize;
         tricks = 0;
         suitSize = suit.size();
@@ -217,15 +218,14 @@ public class Estimation {
             }
         } else if (Case == 5) {
             if (masters == 2 && suitSize == 5) {
-                    tricks += (suitSize - 2);
+                tricks += (suitSize - 2);
             } else if (masters > 2) {
                 if (suitSize < 7) {
                     tricks += (suitSize - 2);
                 } else {
-                    if(ace && king){
+                    if (ace && king) {
                         tricks += suitSize;
-                    }
-                    else{
+                    } else {
                         tricks += (suitSize - 1);
                     }
                 }
@@ -234,7 +234,7 @@ public class Estimation {
 
         return tricks;
     }
-    
+
     public static Call maxOpenBidding(ArrayList<Integer> hand) {
         Call c = new Call(true);
 
@@ -293,7 +293,7 @@ public class Estimation {
             if (masters.get(i) % 13 == 0) {
                 greatestMaster = 13;
                 aceCounter++;
-                totalMasterPoints+=13;
+                totalMasterPoints += 13;
             } else if ((masters.get(i) % 13) > greatestMaster) {
                 greatestMaster = (masters.get(i) % 13);
             }
@@ -585,7 +585,7 @@ public class Estimation {
             if (masters.get(i) % 13 == 0) {
                 greatestMaster = 13;
                 aceCounter++;
-                totalMasterPoints+=13;
+                totalMasterPoints += 13;
             } else if ((masters.get(i) % 13) > greatestMaster) {
                 greatestMaster = (masters.get(i) % 13);
             }
@@ -817,6 +817,59 @@ public class Estimation {
         return c;
     }
 
+    public static void calculatePositions(ArrayList<Player> players) {
+        //bubble sort
+        Player[] playerArray = new Player[4];
+
+        for (int i = 0; i < 4; i++) {
+            playerArray[i] = players.get(i);
+        }
+
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                if (playerArray[i].getScore() > playerArray[j].getScore()) {
+                    if (i > j) {
+                        Player temp = playerArray[j];
+                        playerArray[j] = playerArray[i];
+                        playerArray[i] = temp;
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < 4; i++) {
+            playerArray[i].setPosition(i);
+        }
+//        if two players have the same score, this makes it so that they don't have the same position
+//        for (HashMap.Entry key1 : positionMap.entrySet()) {
+//            for (HashMap.Entry key2 : positionMap.entrySet()) {
+//                if (!key1.equals(key2)) {
+//                    if (key1.getValue().equals(key2.getValue())) {
+//                        if ((int) key1.getValue() <= 2) {
+//                            key2.setValue((int) key2.getValue() + 1);
+//                            break;
+//                        } else if ((int) key1.getValue() > 2) {
+//                            key2.setValue((int) key2.getValue() - 1);
+//                            break;
+//                        }
+//                    }
+//                }
+//            }
+//            Player p = (Player) key1.getKey();
+//            p.setPosition((int) key1.getValue());
+//        }
+
+        for (int i = 0; i < 4; i++) {
+            for (Player player : players) {
+                if (player.getPosition() == i) {
+                    System.out.println("Position " + (i + 1) + ") " + player.getName() + " - " + player.getScore());
+                }
+            }
+        }
+
+//        return positionMap;
+    }
+
     public static void main(String[] args) {
 //        User u1 = new User("Ahmad");
 //        u1.addCardToHand(5); u1.addCardToHand(12); u1.addCardToHand(42); u1.addCardToHand(51);
@@ -866,7 +919,6 @@ public class Estimation {
 //                System.out.println("\t\t\t"+c.getTricks() + " " + c.getSuit());
 //            }
 //        }
-
 //        System.out.println(suitPoints(suit));
         User u1 = new User("Ahmad");
         User u2 = new User("Negm");
@@ -878,7 +930,16 @@ public class Estimation {
         Computer c3 = new Computer("Computer3");
         Computer c4 = new Computer("Computer4");
 
-        Session s1 = new Session(u1, c2, c3, c4, "Easy");
+//        u1.incrementScore(21);
+//        u2.incrementScore(-1);
+//        u3.incrementScore(-1);
+//        u4.incrementScore(20);
+        ArrayList<Player> players = new ArrayList<>(Arrays.asList(u1, u2, u3, u4));
+
+//        Estimation.calculatePositions(players);
+//        Session s1 = new Session(u1, c2, c3, c4);
+        Session s1 = new Session(u1, u2, u3, u4);
+        s1.Start();
     }
 
 }
