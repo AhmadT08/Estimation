@@ -30,7 +30,7 @@ public class Session {
 
     public void Start() {
         setPlayerSession();
-        roundNumber = 14;
+        roundNumber = 18;
         r = new Round(0, players, this, roundNumber);
         r.startRound(dealer);
         clearPlayerState();
@@ -56,15 +56,20 @@ public class Session {
 
     public void nextRound(Round previousRound) {
         roundList.add(previousRound);
-        roundNumber++;
-        if (dealer == 3) {
-            dealer = 0;
+        if (roundNumber == 18) {
+            endSession();
         } else {
-            dealer++;
+            roundNumber++;
+            if (dealer == 3) {
+                dealer = 0;
+            } else {
+                dealer++;
+            }
+            clearPlayerState();
+            r = new Round(0, players, this, roundNumber);
+            r.startRound(dealer);
         }
-        clearPlayerState();
-        r = new Round(0, players, this, roundNumber);
-        r.startRound(dealer);
+
     }
 
     public void clearPlayerState() {
@@ -78,13 +83,20 @@ public class Session {
         Player winner = new Player();
 
         for (int i = 0; i < 4; i++) {
-            if (players.get(i).getPosition() == 1) {
+            if (players.get(i).getPosition() == 0) {
                 winner = players.get(i);
             }
         }
 
-        System.out.println("The winner is " + winner.getName() + " with a score of " + winner.getScore());
-        
-        
+        System.out.println("The winner is " + winner.getName() + " with a score of " + winner.getScore() + "\n --------------------------------------------------------");
+
+        for (int i = 0; i < 4; i++) {
+            for (Player player : players) {
+                if (player.getPosition() == i) {
+                    System.out.println("Position " + (i + 1) + ") " + player.getName() + " - " + player.getScore());
+                }
+            }
+        }
+
     }
 }

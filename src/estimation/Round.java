@@ -437,7 +437,7 @@ public class Round {
     }
 
     public void startPlay(int cursor) {
-        System.out.println("Round has started. " + call.getCaller().getName() + " starts.");
+        System.out.println("Round has started. Score Multiplier = [x" + Multiplier + "]\n"+ call.getCaller().getName() + " starts.");
 
         ArrayList<Card> hand = new ArrayList();
 //        ArrayList<Player> cardPlayers = new ArrayList();
