@@ -18,66 +18,93 @@ import java.util.Scanner;
  */
 public class Estimation {
 
-    public static void Translate(ArrayList<Integer> list) {
+    public static void translate(ArrayList<Integer> list) {
         Collections.sort(list);
         Collections.reverse(list);
 
-        for (int j = 0; j < 13; j++) {
-            int card = list.get(j);
-            if ((card - 1) / 13 == 0) {
-                if (card % 13 == 0) {
-                    System.out.println("Ace of Clubs");
-                } else if (card % 13 == 12) {
-                    System.out.println("King of Clubs");
-                } else if (card % 13 == 11) {
-                    System.out.println("Queen of Clubs");
-                } else if (card % 13 == 10) {
-                    System.out.println("Jack of Clubs");
-                } else {
-                    System.out.println(card % 13 + " of Clubs");
-                }
+        ArrayList<Integer> spades = new ArrayList();
+        ArrayList<Integer> hearts = new ArrayList();
+        ArrayList<Integer> diamonds = new ArrayList();
+        ArrayList<Integer> clubs = new ArrayList();
+        ArrayList<ArrayList<Integer>> handSuits = new ArrayList<>(Arrays.asList(spades, hearts, diamonds, clubs));
+
+        for (int i = 0; i < list.size(); i++) { //Organize hand into suits
+            int card = list.get(i); //Get next card
+
+            if ((card - 1) / 13 == 0) { //Check if card is in the first 13 cards of the deck (Clubs)
+                clubs.add(card);
             }
             if ((card - 1) / 13 == 1) {
-                if (card % 13 == 0) {
-                    System.out.println("Ace of Diamonds");
-                } else if (card % 13 == 12) {
-                    System.out.println("King of Diamonds");
-                } else if (card % 13 == 11) {
-                    System.out.println("Queen of Diamonds");
-                } else if (card % 13 == 10) {
-                    System.out.println("Jack of Diamonds");
-                } else {
-                    System.out.println(card % 13 + " of Diamonds");
-                }
+                diamonds.add(card);
             }
             if ((card - 1) / 13 == 2) {
-                if (card % 13 == 0) {
-                    System.out.println("Ace of Hearts");
-                } else if (card % 13 == 12) {
-                    System.out.println("King of Hearts");
-                } else if (card % 13 == 11) {
-                    System.out.println("Queen of Hearts");
-                } else if (card % 13 == 10) {
-                    System.out.println("Jack of Hearts");
-                } else {
-                    System.out.println(card % 13 + " of Hearts");
-                }
+                hearts.add(card);
             }
             if ((card - 1) / 13 == 3) {
-                if (card % 13 == 0) {
-                    System.out.println("Ace of Spades");
-                } else if (card % 13 == 12) {
-                    System.out.println("King of Spades");
-                } else if (card % 13 == 11) {
-                    System.out.println("Queen of Spades");
-                } else if (card % 13 == 10) {
-                    System.out.println("Jack of Spades");
-                } else {
-                    System.out.println(card % 13 + " of Spades");
-                }
+                spades.add(card);
             }
-
         }
+
+        for (ArrayList<Integer> suit : handSuits) {
+            System.out.println();
+            for (int i : suit) {
+                int card = i;
+                if ((card - 1) / 13 == 0) {
+                    if (card % 13 == 0) {
+                        System.out.println("Ace of Clubs");
+                    } else if (card % 13 == 12) {
+                        System.out.println("King of Clubs");
+                    } else if (card % 13 == 11) {
+                        System.out.println("Queen of Clubs");
+                    } else if (card % 13 == 10) {
+                        System.out.println("Jack of Clubs");
+                    } else {
+                        System.out.println(((card % 13) + 1) + " of Clubs");
+                    }
+                }
+                if ((card - 1) / 13 == 1) {
+                    if (card % 13 == 0) {
+                        System.out.println("Ace of Diamonds");
+                    } else if (card % 13 == 12) {
+                        System.out.println("King of Diamonds");
+                    } else if (card % 13 == 11) {
+                        System.out.println("Queen of Diamonds");
+                    } else if (card % 13 == 10) {
+                        System.out.println("Jack of Diamonds");
+                    } else {
+                        System.out.println(((card % 13) + 1) + " of Diamonds");
+                    }
+                }
+                if ((card - 1) / 13 == 2) {
+                    if (card % 13 == 0) {
+                        System.out.println("Ace of Hearts");
+                    } else if (card % 13 == 12) {
+                        System.out.println("King of Hearts");
+                    } else if (card % 13 == 11) {
+                        System.out.println("Queen of Hearts");
+                    } else if (card % 13 == 10) {
+                        System.out.println("Jack of Hearts");
+                    } else {
+                        System.out.println(((card % 13) + 1) + " of Hearts");
+                    }
+                }
+                if ((card - 1) / 13 == 3) {
+                    if (card % 13 == 0) {
+                        System.out.println("Ace of Spades");
+                    } else if (card % 13 == 12) {
+                        System.out.println("King of Spades");
+                    } else if (card % 13 == 11) {
+                        System.out.println("Queen of Spades");
+                    } else if (card % 13 == 10) {
+                        System.out.println("Jack of Spades");
+                    } else {
+                        System.out.println(((card % 13) + 1) + " of Spades");
+                    }
+                }
+
+            }
+        }
+
     }
 
     public static ArrayList Deal() {
@@ -521,7 +548,6 @@ public class Estimation {
 //        if (tricks > 3) {
 //            c = new Call(tricks, callSuit, false, new Player());
 //        }
-
         return c;
     }
 
@@ -811,7 +837,12 @@ public class Estimation {
 //        System.out.println(tricks + " " + callSuit);
 
         if (tricks > 3) {
-//            c = new Call(tricks, callSuit, false, new Player());
+            c = new Call(tricks, callSuit, false, new User("s"));
+
+            System.out.println("-------------------------------");
+            translate(hand);
+            System.out.println("\tCall: " + tricks + " " + callSuit);
+            System.out.println("-------------------------------");
         }
 
         return c;
@@ -870,6 +901,128 @@ public class Estimation {
 //        return positionMap;
     }
 
+    public static Boolean dashCall(ArrayList<Integer> h) {
+        Boolean b = true;
+//        System.out.println(name);
+//        translate();
+//        System.out.println();
+
+        ArrayList<Integer> spades = new ArrayList();
+        ArrayList<Integer> hearts = new ArrayList();
+        ArrayList<Integer> diamonds = new ArrayList();
+        ArrayList<Integer> clubs = new ArrayList();
+        ArrayList<ArrayList> handSuits = new ArrayList<>(Arrays.asList(spades, hearts, diamonds, clubs));
+
+        for (int i = 0; i < h.size(); i++) { //Organize hand into suits
+            int card = h.get(i); //Get next card
+
+            if ((card - 1) / 13 == 0) { //Check if card is in the first 13 cards of the deck (Clubs)
+                clubs.add(card);
+            }
+            if ((card - 1) / 13 == 1) {
+                diamonds.add(card);
+            }
+            if ((card - 1) / 13 == 2) {
+                hearts.add(card);
+            }
+            if ((card - 1) / 13 == 3) {
+                spades.add(card);
+            }
+        }
+
+        int aceCounter = 0;
+
+        for (int i = 0; i < 4; i++) {
+            ArrayList<Integer> temp = handSuits.get(i);
+            int masterCount = 0;
+
+            if (temp.size() > 0 && (temp.get(0) % 13 == 0 && temp.get(temp.size() - 1) % 13 == 0)) {
+                aceCounter++;
+            }
+
+            for (Integer card : temp) {
+                if ((card % 13 == 0) || (card % 13 > 9)) {
+                    masterCount++;
+                }
+            }
+
+            //Rule 1: If a suit in the hand has master cards,
+            //        and half or more of the suit is master cards,
+            //        dash call cannot be called
+            if ((temp.size() > 0)
+                    && (masterCount >= (float) (temp.size() / 2))) {
+//                System.out.println("\t\t\tRule 1");
+                b = false;
+            }
+
+            //Rule 2: If a suit in the hand has less than 4 cards,
+            //        and one of them is an Ace,
+            //        dash call cannot be called
+            if ((temp.size() <= 3 && temp.size() > 0)
+                    && (temp.get(0) % 13 == 0)) {
+//                System.out.println("\t\t\tRule 2");
+                b = false;
+            }
+
+            //Rule 3: If a suit in the hand has 1 card,
+            //        and greater than a 5,
+            //        dash call cannot be called
+            if (((temp.size() == 1) && (((temp.get(0) % 13) > 5)
+                    || (temp.get(0) % 13) == 0))) {
+//                System.out.println("\t\t\tRule 3");
+                b = false;
+            }
+
+            //Rule 4: If the hand contains more than 2 aces,
+            //        dash call cannot be called
+            if (aceCounter > 2) {
+//                System.out.println("\t\t\tRule 4");
+                b = false;
+            }
+
+            //Rule 5: If the smallest card in a suit in the hand is greater than 5
+            //        dash call cannot be called
+            if (temp.size() > 0 && temp.size() < 3) {
+                if (temp.get(temp.size() - 1) > 5) {
+//                  System.out.println("\t\t\tRule 5");
+                    b = false;
+                }
+            }
+        }
+
+        if (b == true) {
+//            System.out.println("\t DASHCALL!");
+            System.out.println("\n\n");
+            translate(h);
+            System.out.println("\n\n");
+        }
+        return b;
+    }
+
+    public static int testDashCall() {
+        int dashCounter = 0;
+        for (int i = 0; i < 500; i++) {
+            ArrayList<ArrayList<Integer>> lists = Deal();
+
+            for (ArrayList<Integer> list : lists) {
+                if (dashCall(list)) {
+                    dashCounter++;
+                }
+            }
+        }
+        return dashCounter;
+    }
+
+    public static void testOpenBidding(ArrayList<Integer> hand) {
+        for (int i = 0; i < 100; i++) {
+            ArrayList<ArrayList<Integer>> lists = Deal();
+
+            for (ArrayList<Integer> list : lists) {
+                openBidding(list);
+            }
+        }
+    }
+
     public static void main(String[] args) {
 //        User u1 = new User("Ahmad");
 //        u1.addCardToHand(5); u1.addCardToHand(12); u1.addCardToHand(42); u1.addCardToHand(51);
@@ -920,6 +1073,8 @@ public class Estimation {
 //            }
 //        }
 //        System.out.println(suitPoints(suit));
+//        int i;
+        
         User u1 = new User("Ahmad");
         User u2 = new User("Negm");
         User u3 = new User("Ramy");
@@ -934,12 +1089,11 @@ public class Estimation {
 //        u2.incrementScore(-1);
 //        u3.incrementScore(-1);
 //        u4.incrementScore(20);
-        ArrayList<Player> players = new ArrayList<>(Arrays.asList(u1, u2, u3, u4));
-
+//        ArrayList<Player> players = new ArrayList<>(Arrays.asList(u1, u2, u3, u4));
 //        Estimation.calculatePositions(players);
 //        Session s1 = new Session(u1, c2, c3, c4);
         Session s1 = new Session(u1, u2, u3, u4);
-        s1.startSession();
+//        s1.startSession();
     }
 
 }

@@ -54,7 +54,7 @@ public abstract class Suit {
         return result;
     }
 
-    public int compareWeight(ArrayList<Integer> hand, Suit suit) {
+    public int compareWeight(ArrayList<Integer> hand) {
         //if x and y are trump cards, they are compared in size
         //if x is a trump card and y is not, x is larger
         //if x and y are not trump cards, 

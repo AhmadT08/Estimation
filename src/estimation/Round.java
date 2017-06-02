@@ -315,7 +315,7 @@ public class Round {
                         } else {
                             players.get(cursor).secondRoundBidding(0, call);
                         }
-
+                                
                     } else {
                         players.get(cursor).secondRoundBidding(call);
                     }
@@ -439,10 +439,10 @@ public class Round {
             }
 
             if (hasTrumpCard) {
-                Player p = determineHandWinner(trumpSuit.compareWeight(handCards, suit), hand);
+                Player p = determineHandWinner(trumpSuit.compareWeight(handCards), hand);
                 cursor = players.indexOf(p);
             } else {
-                Player p = determineHandWinner(suit.compareWeight(handCards, suit), hand);
+                Player p = determineHandWinner(suit.compareWeight(handCards), hand);
                 cursor = players.indexOf(p);
             }
 

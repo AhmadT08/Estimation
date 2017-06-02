@@ -158,8 +158,6 @@ public class User extends Player {
         int bid = -1;
         Scanner sc = new Scanner(System.in);
 
-        Boolean b = true;
-
         while (!inRange(bid, limit, call)) {
 
             System.out.println("Make a bid not equal to " + limit + " and less than or equal to " + call.getTricks());
