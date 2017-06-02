@@ -108,7 +108,6 @@ public abstract class Suit {
 //        if (suit.getClass() != this.getClass()) {
 //            result = suit.compareWeight(hand, suit);
 //        }
-
         return result;
     }
 

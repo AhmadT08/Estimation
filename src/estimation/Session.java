@@ -15,10 +15,10 @@ public class Session {
 
     private int dealer = 0;
     private int multiplier;
-    private Round r;
+    private Round currentRound;
     private int roundNumber;
     private ArrayList<Round> roundList = new ArrayList();
-    private ArrayList<Player> players = new ArrayList(4);
+    private final ArrayList<Player> players = new ArrayList(4);
 
     public Session(Player p1, Player p2, Player p3, Player p4) {
         players.add(p1);
@@ -28,11 +28,11 @@ public class Session {
         this.multiplier = 0;
     }
 
-    public void Start() {
+    public void startSession() {
         setPlayerSession();
-        roundNumber = 18;
-        r = new Round(0, players, this, roundNumber);
-        r.startRound(dealer);
+        roundNumber = 1;
+        currentRound = new Round(0, players, this, roundNumber);
+        currentRound.startRound(dealer);
         clearPlayerState();
     }
 
@@ -42,16 +42,16 @@ public class Session {
         }
     }
 
-    public void RestartRound(int multi) {
+    public void restartRound(int multi) {
         System.out.println("Round restarted");
         clearPlayerState();
-        r = new Round(multi + 2, players, this, roundNumber);
+        currentRound = new Round(multi + 2, players, this, roundNumber);
         if (dealer == 3) {
             dealer = 0;
         } else {
             dealer++;
         }
-        r.startRound(dealer);
+        currentRound.startRound(dealer);
     }
 
     public void nextRound(Round previousRound) {
@@ -66,8 +66,8 @@ public class Session {
                 dealer++;
             }
             clearPlayerState();
-            r = new Round(0, players, this, roundNumber);
-            r.startRound(dealer);
+            currentRound = new Round(0, players, this, roundNumber);
+            currentRound.startRound(dealer);
         }
 
     }
@@ -80,7 +80,7 @@ public class Session {
     }
 
     public void endSession() {
-        Player winner = new Player();
+        Player winner = players.get(1);
 
         for (int i = 0; i < 4; i++) {
             if (players.get(i).getPosition() == 0) {

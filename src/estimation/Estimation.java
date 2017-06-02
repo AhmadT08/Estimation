@@ -518,9 +518,9 @@ public class Estimation {
         }
 //        System.out.println(tricks + " " + callSuit);
 
-        if (tricks > 3) {
-            c = new Call(tricks, callSuit, false, new Player());
-        }
+//        if (tricks > 3) {
+//            c = new Call(tricks, callSuit, false, new Player());
+//        }
 
         return c;
     }
@@ -811,7 +811,7 @@ public class Estimation {
 //        System.out.println(tricks + " " + callSuit);
 
         if (tricks > 3) {
-            c = new Call(tricks, callSuit, false, new Player());
+//            c = new Call(tricks, callSuit, false, new Player());
         }
 
         return c;
@@ -939,7 +939,7 @@ public class Estimation {
 //        Estimation.calculatePositions(players);
 //        Session s1 = new Session(u1, c2, c3, c4);
         Session s1 = new Session(u1, u2, u3, u4);
-        s1.Start();
+        s1.startSession();
     }
 
 }

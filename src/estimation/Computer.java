@@ -589,7 +589,7 @@ public class Computer extends Player {
 //        System.out.println(tricks + " " + callSuit);
 
         if (tricks > 3) {
-            c = new Call(tricks, callSuit, false, new Player());
+            c = new Call(tricks, callSuit, false, this);
         }
 
         return c;
@@ -1321,6 +1321,11 @@ public class Computer extends Player {
 
     @Override
     public int playCard() {
+        return 0;
+    }
+
+    @Override
+    public int playCard(Suit suit, Suit trumpSuit) {
         return 0;
     }
 }

@@ -203,7 +203,7 @@ public class Round {
         }
 
         if (passCounter == 4) {
-            session.RestartRound(Multiplier);
+            session.restartRound(Multiplier);
             restart = true;
         } else if (bidCalls.size() > 1) {
             x = raiseFold(bidCalls);
@@ -211,9 +211,11 @@ public class Round {
             x = bidCalls.get(0);
         }
 
-        for (int j = 0; j < 4; j++) {
-            if (roundCalls.get(j).getCaller().equals(x.getCaller())) {
-                roundCalls.set(j, x);
+        if (roundNumber >= 14) {
+            for (int j = 0; j < 4; j++) {
+                if (roundCalls.get(j).getCaller().equals(x.getCaller())) {
+                    roundCalls.set(j, x);
+                }
             }
         }
 
@@ -247,44 +249,6 @@ public class Round {
             }
         }
         return c;
-    }
-
-    public int testDashCall() {
-//        int cursor = 0;
-        int dash = 0;
-        for (int j = 0; j < 4; j++) {
-            if (players.get(j).hasCall()) {
-                System.out.println("\nHAS CALL");
-                translate(players.get(j).getHand());
-                System.out.println("");
-            } else {
-                if (players.get(j).dashCall()) {
-                    System.out.println("\nDASHCALL!!");
-
-                    if (players.get(j).isAvoid()) {
-                        System.out.println("Avoid");
-                    }
-
-                    translate(players.get(j).getHand());
-                    dash++;
-                }
-            }
-        }
-        return dash;
-    }
-
-    public void testHasCall() {
-        for (int j = 0; j < 4; j++) {
-            if (players.get(j).hasCall()) {
-                System.out.println();
-
-                if (players.get(j).isAvoid()) {
-                    System.out.println("Avoid");
-                }
-
-                translate(players.get(j).getHand());
-            }
-        }
     }
 
     public int nextCursor(int cursor) {
@@ -437,7 +401,7 @@ public class Round {
     }
 
     public void startPlay(int cursor) {
-        System.out.println("Round has started. Score Multiplier = [x" + Multiplier + "]\n"+ call.getCaller().getName() + " starts.");
+        System.out.println("Round has started. Score Multiplier = [x" + Multiplier + "]\n" + call.getCaller().getName() + " starts.");
 
         ArrayList<Card> hand = new ArrayList();
 //        ArrayList<Player> cardPlayers = new ArrayList();
@@ -523,8 +487,8 @@ public class Round {
                     }
                 }
             }
-            
-            if(roundCalls.get(0).getTricks() == roundCalls.get(2).getTricks()){
+
+            if (roundCalls.get(0).getTricks() == roundCalls.get(2).getTricks()) {
                 Multiplier += 2;
             }
 
@@ -559,7 +523,7 @@ public class Round {
         }
 
         if (winners == 0) {
-            session.RestartRound(multiplier + 2);
+            session.restartRound(multiplier + 2);
             restart = true;
         } else {
             for (Player player : players) {
@@ -597,13 +561,13 @@ public class Round {
                             }
                         }
                     } else {
-                        if (actual > 7) {
+                        if (predicted > 7) {
                             if (losers == 1) {
-                                player.decrementScore((((actual * actual) / 2) + 10 + risk) * multiplier);
+                                player.decrementScore((((predicted * predicted) / 2) + 10 + risk) * multiplier);
                             } else {
-                                player.decrementScore((((actual * actual) / 2) + risk) * multiplier);
+                                player.decrementScore((((predicted * predicted) / 2) + risk) * multiplier);
                             }
-                        } else if (actual <= 7) {
+                        } else if (predicted <= 7) {
                             if (losers == 1) {
                                 player.decrementScore(((Math.abs(actual - predicted) + 10) + 10 + risk) * multiplier);
                             } else {

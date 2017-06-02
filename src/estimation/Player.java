@@ -13,7 +13,7 @@ import java.util.Collections;
  *
  * @author Ahmad
  */
-public class Player {
+public abstract class Player {
 
     protected String name;
     private int score;
@@ -307,15 +307,6 @@ public class Player {
         Collections.sort(hand);
     }
 
-    public Boolean dashCall() {
-        return false;
-    }
-
-    public Call openBidding() {
-        Call c = new Call(true);
-        return c;
-    }
-
     public Boolean isAvoid() {
         Boolean b = false;
 
@@ -404,118 +395,20 @@ public class Player {
         return b;
     }
 
-    public Boolean fullHouse(ArrayList<Integer> c) {
-        Boolean b = false;
+    public abstract Call secondRoundBidding(Call call);
 
-        if (c.size() > 3) {
-            if (c.get(c.size() - 1) % 13 == 0) {
-                if (c.get(c.size() - 4) % 13 == 10) {
-                    b = true;
-                }
-            }
-        }
+    public abstract Call secondRoundBidding(int limit, Call call);
 
-        return b;
-    }
+    public abstract Call fastBidding(Suit suit);
 
-    public Boolean has3Masters(ArrayList<Integer> c) {
-        Boolean b = false;
+    public abstract Call fastBidding(Suit suit, int limit);
 
-        if (c.size() > 2) {
-            if (c.get(c.size() - 1) % 13 == 0) {
-                if (c.get(c.size() - 3) % 13 >= 10) {
-                    b = true;
-                }
-            }
-        }
+    public abstract int playCard();
 
-        if (c.size() > 2) {
-            if (c.get(c.size() - 1) % 13 == 12) {
-                if (c.get(c.size() - 3) % 13 >= 10) {
-                    b = true;
-                }
-            }
-        }
+    public abstract int playCard(Suit suit, Suit trumpSuit);
 
-        return b;
-    }
+    public abstract Boolean dashCall();
 
-    public Boolean hasCall() {
-        Boolean b = false;
-
-        int aceCounter = 0;
-
-        ArrayList<Integer> h = getHand();
-        ArrayList<Integer> spades = new ArrayList();
-        ArrayList<Integer> hearts = new ArrayList();
-        ArrayList<Integer> diamonds = new ArrayList();
-        ArrayList<Integer> clubs = new ArrayList();
-        ArrayList<ArrayList> handSuits = new ArrayList<>(Arrays.asList(spades, hearts, diamonds, clubs));
-
-        for (int i = 0; i < h.size(); i++) { //Organize hand into suits
-            int card = h.get(i); //Get next card
-
-            if (card % 13 == 0) {
-                aceCounter++;
-            }
-
-            if ((card - 1) / 13 == 0) { //Check if card is in the first 13 cards of the deck (Clubs)
-                clubs.add(card);
-            }
-            if ((card - 1) / 13 == 1) {
-                diamonds.add(card);
-            }
-            if ((card - 1) / 13 == 2) {
-                hearts.add(card);
-            }
-            if ((card - 1) / 13 == 3) {
-                spades.add(card);
-            }
-        }
-
-        for (int i = 0; i < 4; i++) {
-            if (fullHouse(handSuits.get(i))) {
-                b = true;
-            }
-
-            if (has3Masters(handSuits.get(i))) {
-                if (aceCounter > 1) {
-                    b = true;
-                }
-            }
-
-        }
-
-        return b;
-    }
-
-    public Call secondRoundBidding(Call call) {
-        //initiates second round of bidding for when the player is not on the caller's left
-
-        return new Call(true);
-    }
-
-    public Call secondRoundBidding(int limit, Call call) {
-        //initiates second round of bidding for when the player is on the caller's left
-        //this method takes into account that the total sum of all bids cannot equal 13
-
-        return new Call(true);
-    }
-
-    public Call fastBidding(Suit suit) {
-        return new Call(true);
-    }
-
-    public Call fastBidding(Suit suit, int limit) {
-        return new Call(true);
-    }
-
-    public int playCard() {
-        return 0;
-    }
-
-    public int playCard(Suit suit, Suit trumpSuit) {
-        return 0;
-    }
+    public abstract Call openBidding();
 
 }

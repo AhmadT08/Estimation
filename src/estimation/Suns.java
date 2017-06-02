@@ -14,7 +14,6 @@ import java.util.ArrayList;
 public class Suns extends Suit {
     
     Suns(){
-        
         cards = new ArrayList();
         for (int i = 1; i < 53; i++) {
             cards.add(i);
