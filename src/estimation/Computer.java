@@ -901,7 +901,7 @@ public class Computer extends Player {
 
     @Override
     public Boolean dashCall() {
-        Boolean b = true;
+        Boolean dash = true;
 //        System.out.println(name);
 //        translate();
 //        System.out.println();
@@ -952,7 +952,7 @@ public class Computer extends Player {
             if ((temp.size() > 0)
                     && (masterCount >= (float) (temp.size() / 2))) {
 //                System.out.println("\t\t\tRule 1");
-                b = false;
+                dash = false;
             }
 
             //Rule 2: If a suit in the hand has less than 4 cards,
@@ -961,7 +961,7 @@ public class Computer extends Player {
             if ((temp.size() <= 3 && temp.size() > 0)
                     && (temp.get(0) % 13 == 0)) {
 //                System.out.println("\t\t\tRule 2");
-                b = false;
+                dash = false;
             }
 
             //Rule 3: If a suit in the hand has 1 card,
@@ -970,14 +970,14 @@ public class Computer extends Player {
             if (((temp.size() == 1) && (((temp.get(0) % 13) > 5)
                     || (temp.get(0) % 13) == 0))) {
 //                System.out.println("\t\t\tRule 3");
-                b = false;
+                dash = false;
             }
 
             //Rule 4: If the hand contains more than 2 aces,
             //        dash call cannot be called
             if (aceCounter > 2) {
 //                System.out.println("\t\t\tRule 4");
-                b = false;
+                dash = false;
             }
 
             //Rule 5: If the smallest card in a suit in the hand is greater than 5
@@ -985,19 +985,19 @@ public class Computer extends Player {
             if (temp.size() > 0 && temp.size() < 3) {
                 if (temp.get(temp.size() - 1) > 5) {
 //                  System.out.println("\t\t\tRule 5");
-                    b = false;
+                    dash = false;
                 }
             }
         }
 
-        if (b == true) {
+        if (dash == true) {
 //            System.out.println("\t DASHCALL!");
             System.out.println("\n\n");
             translate();
             System.out.println("\n\n");
             setCall(new Call(true, this));
         }
-        return b;
+        return dash;
     }
 
     @Override
