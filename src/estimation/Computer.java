@@ -16,6 +16,8 @@ import java.util.Scanner;
  * @author Ahmad
  */
 public class Computer extends Player {
+    
+    
 
     public Computer(String n) {
         super();
@@ -1310,6 +1312,7 @@ public class Computer extends Player {
 
     @Override
     public int playCard() {
+        
         return 0;
     }
 

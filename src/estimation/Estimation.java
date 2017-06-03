@@ -107,25 +107,97 @@ public class Estimation {
 
     }
 
-    public static ArrayList Deal() {
+    public static String translate(int card) {
+        String x = "";
+
+        if ((card - 1) / 13 == 0) { //Check if card is in the first 13 cards of the deck (Clubs)
+            if (card % 13 == 0) {
+                x = "Ace of Clubs"; //The ace is the 13th card in the suit
+            } else if (card % 13 == 12) {
+                x = "King of Clubs"; //The king is the 12th card in the suit
+            } else if (card % 13 == 11) {
+                x = "Queen of Clubs"; //The queen is the 11th card in the suit
+            } else if (card % 13 == 10) {
+                x = "Jack of Clubs"; //The jack is the 10th card in the suit 
+            } else {
+                x = ((card % 13) + 1) + " of Clubs";
+            }
+        }
+        if ((card - 1) / 13 == 1) {
+            if (card % 13 == 0) {
+                x = "Ace of Diamonds";
+            } else if (card % 13 == 12) {
+                x = "King of Diamonds";
+            } else if (card % 13 == 11) {
+                x = "Queen of Diamonds";
+            } else if (card % 13 == 10) {
+                x = "Jack of Diamonds";
+            } else {
+                x = ((card % 13) + 1) + " of Diamonds";
+            }
+        }
+        if ((card - 1) / 13 == 2) {
+            if (card % 13 == 0) {
+                x = "Ace of Hearts";
+            } else if (card % 13 == 12) {
+                x = "King of Hearts";
+            } else if (card % 13 == 11) {
+                x = "Queen of Hearts";
+            } else if (card % 13 == 10) {
+                x = "Jack of Hearts";
+            } else {
+                x = ((card % 13) + 1) + " of Hearts";
+            }
+        }
+        if ((card - 1) / 13 == 3) {
+            if (card % 13 == 0) {
+                x = "Ace of Spades";
+            } else if (card % 13 == 12) {
+                x = "King of Spades";
+            } else if (card % 13 == 11) {
+                x = "Queen of Spades";
+            } else if (card % 13 == 10) {
+                x = "Jack of Spades";
+            } else {
+                x = ((card % 13) + 1) + " of Spades";
+            }
+        }
+
+        return x;
+    }
+
+    public static void Deal(ArrayList<Player> players) {
         ArrayList<Integer> cards = new ArrayList(52);
         for (int i = 1; i < 53; i++) {
             cards.add(i);
         }
-        Collections.shuffle(cards);
 
-        ArrayList<Integer> p1cards = new ArrayList(13);
-        ArrayList<Integer> p2cards = new ArrayList(13);
-        ArrayList<Integer> p3cards = new ArrayList(13);
-        ArrayList<Integer> p4cards = new ArrayList(13);
-        ArrayList<ArrayList> cardLists = new ArrayList<>(Arrays.asList(p1cards, p2cards, p3cards, p4cards));
+        Collections.shuffle(cards);
 
         for (int i = 0; i < 4; i++) {
             for (int j = 13 * i; j < 13 * (i + 1); j++) {
-                cardLists.get(i).add(cards.get(j));
+                players.get(i).addCardToHand(cards.get(j));
             }
+
+            players.get(i).sortHand();
         }
-        return cardLists;
+    }
+
+    public static void deal(ArrayList<Computer> computers) {
+        ArrayList<Integer> cards = new ArrayList(52);
+        for (int i = 1; i < 53; i++) {
+            cards.add(i);
+        }
+
+        Collections.shuffle(cards);
+
+        for (int i = 0; i < 4; i++) {
+            for (int j = 13 * i; j < 13 * (i + 1); j++) {
+                computers.get(i).addCardToHand(cards.get(j));
+            }
+
+            computers.get(i).sortHand();
+        }
     }
 
     public static int numberOfMasters(ArrayList<Integer> suit) {
@@ -1003,6 +1075,7 @@ public class Estimation {
         int dashCounter = 0;
         for (int i = 0; i < 500; i++) {
             ArrayList<ArrayList<Integer>> lists = Deal();
+            ArrayList<ArrayList<Integer>> lists = new ArrayList();
 
             for (ArrayList<Integer> list : lists) {
                 if (dashCall(list)) {
@@ -1015,11 +1088,361 @@ public class Estimation {
 
     public static void testOpenBidding(ArrayList<Integer> hand) {
         for (int i = 0; i < 100; i++) {
-            ArrayList<ArrayList<Integer>> lists = Deal();
+//            ArrayList<ArrayList<Integer>> lists = Deal();
+            ArrayList<ArrayList<Integer>> lists = new ArrayList();
 
             for (ArrayList<Integer> list : lists) {
                 openBidding(list);
             }
+        }
+    }
+
+    public static void testDetermineTrickPaths(ArrayList<Computer> computers) {
+        deal(computers);
+        for (int i = 0; i < computers.size(); i++) {
+            Computer computer = computers.get(i);
+            System.out.println("----------------------------------------");
+            translate(computer.getHand());
+            computer.getCall().setSuit("Spades");
+            computer.setCaller(false);
+            computers.get(3).setCaller(true);
+            determineTrickPaths(computer);
+        }
+    }
+
+    public static void determineTrickPaths(Computer c1) {
+        ArrayList<Trick> tricks = new ArrayList();
+        ArrayList<Integer> hand = c1.getHand();
+        ArrayList<Integer> spades = new ArrayList();
+        ArrayList<Integer> spadeMasters = new ArrayList();
+        ArrayList<Integer> hearts = new ArrayList();
+        ArrayList<Integer> heartMasters = new ArrayList();
+        ArrayList<Integer> diamonds = new ArrayList();
+        ArrayList<Integer> diamondMasters = new ArrayList();
+        ArrayList<Integer> clubs = new ArrayList();
+        ArrayList<Integer> clubMasters = new ArrayList();
+        ArrayList<ArrayList> handSuits = new ArrayList<>(Arrays.asList(spades, hearts, diamonds, clubs));
+        HashMap<ArrayList<Integer>, ArrayList<Integer>> suitMap = new HashMap();
+
+        for (int i = 0; i < hand.size(); i++) { //Organize hand into suits
+            int card = hand.get(i); //Get next card
+
+            if ((card - 1) / 13 == 0) { //Check if card is in the first 13 cards of the deck (Clubs)
+                clubs.add(card);
+                if (card % 13 == 0 || card % 13 == 12 || card % 13 == 11 || card % 13 == 10) {
+                    clubMasters.add(card);
+                }
+            }
+            if ((card - 1) / 13 == 1) {
+                diamonds.add(card);
+                if (card % 13 == 0 || card % 13 == 12 || card % 13 == 11 || card % 13 == 10) {
+                    diamondMasters.add(card);
+                }
+            }
+            if ((card - 1) / 13 == 2) {
+                hearts.add(card);
+                if (card % 13 == 0 || card % 13 == 12 || card % 13 == 11 || card % 13 == 10) {
+                    heartMasters.add(card);
+                }
+            }
+            if ((card - 1) / 13 == 3) {
+                spades.add(card);
+                if (card % 13 == 0 || card % 13 == 12 || card % 13 == 11 || card % 13 == 10) {
+                    spadeMasters.add(card);
+                }
+            }
+        }
+
+        suitMap.put(spades, spadeMasters);
+        suitMap.put(hearts, heartMasters);
+        suitMap.put(diamonds, diamondMasters);
+        suitMap.put(clubs, clubMasters);
+
+        for (ArrayList<Integer> suit : handSuits) {
+            if (c1.isCaller()) {
+                if (suit.size() > 0) {
+                    if (Suit.returnSuitByName(c1.getCall().getSuit()).trumpCheck(suit.get(0)) && !c1.getCall().getSuit().equals("Suns")) {
+                        if (suitMap.get(suit).size() == 4) {
+                            for (int i : suit) {
+                                tricks.add(new Trick(i, new ArrayList(), "Regular"));
+                            }
+                        } else if (suitMap.get(suit).size() == 3) {
+                            for (int i = 0; i < suit.size() - 1; i++) {
+                                tricks.add(new Trick(suit.get(i), new ArrayList(), "Regular"));
+                            }
+                        } else {
+                            for (int i = 0; i < suitMap.get(suit).size(); i++) {
+                                if (suit.get(i) % 13 == 0) {
+                                    tricks.add(new Trick(suit.get(i), new ArrayList(), "Regular"));
+                                }
+                                if (suit.get(i) % 13 == 12 && suit.size() > 1) {
+                                    tricks.add(new Trick(suit.get(i), new ArrayList<>(Arrays.asList(suit.get(suit.size() - 1))), "Regular"));
+                                }
+                                if (suit.get(i) % 13 == 11 && suit.size() > 2) {
+                                    tricks.add(new Trick(suit.get(i), new ArrayList<>(Arrays.asList(suit.get(suit.size() - 1), suit.get(suit.size() - 2), suit.get(suit.size() - 3))), "Regular"));
+                                }
+                                if (suit.get(i) % 13 == 10 && suit.size() > 3) {
+                                    tricks.add(new Trick(suit.get(i), new ArrayList<>(Arrays.asList(suit.get(suit.size() - 1), suit.get(suit.size() - 2), suit.get(suit.size() - 3))), "Regular"));
+                                }
+                            }
+                            for (int i = 2; i < suitMap.get(suit).size() - 2; i++) {
+                                tricks.add(new Trick(suit.get(i), new ArrayList(), "Regular"));
+                            }
+                        }
+                    } else {
+                        if (suit.size() == 1) {
+                            if (suit.get(0) % 13 == 0) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList(), "Regular"));
+                            }
+                        }
+
+                        if (suit.size() == 2) {
+                            if (suit.get(0) % 13 == 0) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList(), "Regular"));
+                                if (suit.get(1) % 13 == 12 || suit.get(1) % 13 == 11) {
+                                    tricks.add(new Trick(suit.get(1), new ArrayList(), "Regular"));
+                                }
+                            } else if (suit.get(0) % 13 == 12) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList<>(Arrays.asList(suit.get(1))), "Regular"));
+                            }
+                        }
+                        if (suit.size() == 3) {
+                            if (suit.get(0) % 13 == 0) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList(), "Regular"));
+                                if (suit.get(1) % 13 == 12 || suit.get(1) % 13 == 11) {
+                                    tricks.add(new Trick(suit.get(1), new ArrayList<>(Arrays.asList(suit.get(2))), "Regular"));
+                                }
+                            } else if (suit.get(0) % 13 == 12) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList<>(Arrays.asList(suit.get(1), suit.get(2))), "Regular"));
+                                if (suit.get(1) % 13 == 11) {
+                                    tricks.add(new Trick(suit.get(1), new ArrayList<>(Arrays.asList(suit.get(2))), "Regular"));
+                                }
+                            }
+                            if (suit.get(0) % 13 == 11) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList<>(Arrays.asList(suit.get(1), suit.get(2))), "Regular"));
+                            }
+                        }
+                        if (suit.size() == 4) {
+                            if (suit.get(0) % 13 == 0) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList(), "Regular"));
+                                if (suit.get(1) % 13 == 12 || suit.get(1) % 13 == 11) {
+                                    tricks.add(new Trick(suit.get(1), new ArrayList<>(Arrays.asList(suit.get(suit.size() - 1), suit.get(suit.size() - 2))), "Regular"));
+                                }
+                                if (suit.get(2) % 13 == 11) {
+                                    tricks.add(new Trick(suit.get(2), new ArrayList(), "Regular"));
+                                }
+                            } else if (suit.get(0) % 13 == 12) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList<>(Arrays.asList(suit.get(suit.size() - 1), suit.get(suit.size() - 2))), "Regular"));
+                                if (suit.get(1) % 13 == 11) {
+                                    tricks.add(new Trick(suit.get(1), new ArrayList<>(Arrays.asList(suit.get(suit.size() - 1), suit.get(suit.size() - 2))), "Regular"));
+                                }
+                            }
+                            if (suit.get(0) % 13 == 11) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList<>(Arrays.asList(suit.get(suit.size() - 1), suit.get(suit.size() - 2))), "Regular"));
+                            }
+                            if (suit.get(0) % 13 == 10) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList<>(Arrays.asList(suit.get(1), suit.get(2), suit.get(3))), "Regular"));
+                            }
+                        }
+                        if (suit.size() == 5 && !c1.getCall().getSuit().equals("Suns")) {
+                            if (suit.get(0) % 13 == 0) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList(), "Regular"));
+                                if (suit.get(1) % 13 == 12) {
+                                    tricks.add(new Trick(suit.get(0), new ArrayList<>(Arrays.asList(suit.get(suit.size() - 1), suit.get(suit.size() - 2))), "Regular"));
+                                }
+                            }
+                        }
+                        if (suit.size() >= 5 && c1.getCall().getSuit().equals("Suns")) {
+                            if (suit.get(0) % 13 == 0) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList(), "Regular"));
+                                if (suit.get(1) % 13 == 12 || suit.get(1) % 13 == 11) {
+                                    tricks.add(new Trick(suit.get(1), new ArrayList(), "Regular"));
+                                }
+                            } else if (suit.get(0) % 13 == 12) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList<>(Arrays.asList(suit.get(suit.size() - 1), suit.get(suit.size() - 2))), "Regular"));
+                            } else if (suit.get(0) % 13 == 11) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList<>(Arrays.asList(suit.get(suit.size() - 1), suit.get(suit.size() - 2))), "Regular"));
+                            } else if (suit.get(0) % 13 == 10) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList<>(Arrays.asList(suit.get(suit.size() - 1), suit.get(suit.size() - 2), suit.get(suit.size() - 3))), "Regular"));
+                            }
+                        }
+                    }
+                }
+            } else {
+                if (suit.size() > 0) {
+                    if (Suit.returnSuitByName(c1.getCall().getSuit()).trumpCheck(suit.get(0)) && !c1.getCall().getSuit().equals("Suns")) {
+                        if (suit.size() == 1) {
+                            if (suit.get(0) % 13 == 0) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList(), "Regular"));
+                            }
+                        }
+                        if (suit.size() == 2) {
+                            if (suit.get(0) % 13 == 0) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList(), "Regular"));
+                                if (suit.get(1) % 13 == 12 || suit.get(1) % 13 == 11) {
+                                    tricks.add(new Trick(suit.get(1), new ArrayList(), "Regular"));
+                                }
+                            } else if (suit.get(0) % 13 == 12) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList<>(Arrays.asList(suit.get(1))), "Regular"));
+                            }
+                        }
+                        if (suit.size() == 3) {
+                            if (suit.get(0) % 13 == 0) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList(), "Regular"));
+                                if (suit.get(1) % 13 == 12 || suit.get(1) % 13 == 11) {
+                                    tricks.add(new Trick(suit.get(1), new ArrayList<>(Arrays.asList(suit.get(2))), "Regular"));
+                                }
+                            } else if (suit.get(0) % 13 == 12) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList<>(Arrays.asList(suit.get(1), suit.get(2))), "Regular"));
+                                if (suit.get(1) % 13 == 11) {
+                                    tricks.add(new Trick(suit.get(1), new ArrayList<>(Arrays.asList(suit.get(2))), "Regular"));
+                                }
+                            }
+                            if (suit.get(0) % 13 == 11) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList<>(Arrays.asList(suit.get(1), suit.get(2))), "Regular"));
+                            }
+                        }
+                        if (suit.size() == 4) {
+                            if (suit.get(0) % 13 == 0) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList(), "Regular"));
+                                if (suit.get(1) % 13 == 12 || suit.get(1) % 13 == 11) {
+                                    tricks.add(new Trick(suit.get(1), new ArrayList<>(Arrays.asList(suit.get(suit.size() - 1), suit.get(suit.size() - 2))), "Regular"));
+                                }
+                                if (suit.get(2) % 13 == 11) {
+                                    tricks.add(new Trick(suit.get(2), new ArrayList(), "Regular"));
+                                }
+                            } else if (suit.get(0) % 13 == 12) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList<>(Arrays.asList(suit.get(suit.size() - 1), suit.get(suit.size() - 2))), "Regular"));
+                                if (suit.get(1) % 13 == 11) {
+                                    tricks.add(new Trick(suit.get(1), new ArrayList<>(Arrays.asList(suit.get(suit.size() - 1), suit.get(suit.size() - 2))), "Regular"));
+                                }
+                            }
+                            if (suit.get(0) % 13 == 11) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList<>(Arrays.asList(suit.get(suit.size() - 1), suit.get(suit.size() - 2))), "Regular"));
+                            }
+                            if (suit.get(0) % 13 == 10) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList<>(Arrays.asList(suit.get(1), suit.get(2), suit.get(3))), "Regular"));
+                            }
+                        }
+                        if (suit.size() >= 5) {
+                            for (int i = 0; i < suitMap.get(suit).size(); i++) {
+                                if (suit.get(i) % 13 == 0) {
+                                    tricks.add(new Trick(suit.get(i), new ArrayList(), "Regular"));
+                                }
+                                if (suit.get(i) % 13 == 12) {
+                                    tricks.add(new Trick(suit.get(i), new ArrayList<>(Arrays.asList(suit.get(suit.size() - 1), suit.get(suit.size() - 2))), "Regular"));
+                                }
+                                if (suit.get(i) % 13 == 11) {
+                                    tricks.add(new Trick(suit.get(i), new ArrayList<>(Arrays.asList(suit.get(suit.size() - 1), suit.get(suit.size() - 2), suit.get(suit.size() - 3))), "Regular"));
+                                }
+                                if (suit.get(i) % 13 == 10) {
+                                    tricks.add(new Trick(suit.get(i), new ArrayList<>(Arrays.asList(suit.get(suit.size() - 1), suit.get(suit.size() - 2), suit.get(suit.size() - 3))), "Regular"));
+                                }
+                            }
+                        }
+
+                    } else {
+                        if (suit.size() == 1) {
+                            if (suit.get(0) % 13 == 0) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList(), "Regular"));
+                            }
+                        }
+
+                        if (suit.size() == 2) {
+                            if (suit.get(0) % 13 == 0) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList(), "Regular"));
+                                if (suit.get(1) % 13 == 12 || suit.get(1) % 13 == 11) {
+                                    tricks.add(new Trick(suit.get(1), new ArrayList(), "Regular"));
+                                }
+                            } else if (suit.get(0) % 13 == 12) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList<>(Arrays.asList(suit.get(1))), "Regular"));
+                            }
+                        }
+                        if (suit.size() == 3) {
+                            if (suit.get(0) % 13 == 0) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList(), "Regular"));
+                                if (suit.get(1) % 13 == 12 || suit.get(1) % 13 == 11) {
+                                    tricks.add(new Trick(suit.get(1), new ArrayList<>(Arrays.asList(suit.get(2))), "Regular"));
+                                }
+                            } else if (suit.get(0) % 13 == 12) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList<>(Arrays.asList(suit.get(1), suit.get(2))), "Regular"));
+                                if (suit.get(1) % 13 == 11) {
+                                    tricks.add(new Trick(suit.get(1), new ArrayList<>(Arrays.asList(suit.get(2))), "Regular"));
+                                }
+                            }
+                            if (suit.get(0) % 13 == 11) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList<>(Arrays.asList(suit.get(1), suit.get(2))), "Regular"));
+                            }
+                        }
+                        if (suit.size() == 4) {
+                            if (suit.get(0) % 13 == 0) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList(), "Regular"));
+                                if (suit.get(1) % 13 == 12 || suit.get(1) % 13 == 11) {
+                                    tricks.add(new Trick(suit.get(1), new ArrayList<>(Arrays.asList(suit.get(suit.size() - 1), suit.get(suit.size() - 2))), "Regular"));
+                                }
+                                if (suit.get(2) % 13 == 11) {
+                                    tricks.add(new Trick(suit.get(2), new ArrayList(), "Regular"));
+                                }
+                            } else if (suit.get(0) % 13 == 12) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList<>(Arrays.asList(suit.get(suit.size() - 1), suit.get(suit.size() - 2))), "Regular"));
+                                if (suit.get(1) % 13 == 11) {
+                                    tricks.add(new Trick(suit.get(1), new ArrayList<>(Arrays.asList(suit.get(suit.size() - 1), suit.get(suit.size() - 2))), "Regular"));
+                                }
+                            }
+                            if (suit.get(0) % 13 == 11) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList<>(Arrays.asList(suit.get(suit.size() - 1), suit.get(suit.size() - 2))), "Regular"));
+                            }
+                            if (suit.get(0) % 13 == 10) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList<>(Arrays.asList(suit.get(1), suit.get(2), suit.get(3))), "Regular"));
+                            }
+                        }
+                        if (suit.size() == 5 && !c1.getCall().getSuit().equals("Suns")) {
+                            if (suit.get(0) % 13 == 0) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList(), "Regular"));
+                                if (suit.get(1) % 13 == 12) {
+                                    tricks.add(new Trick(suit.get(0), new ArrayList<>(Arrays.asList(suit.get(suit.size() - 1), suit.get(suit.size() - 2))), "Regular"));
+                                }
+                            }
+                        }
+                        if (suit.size() >= 5 && c1.getCall().getSuit().equals("Suns")) {
+                            if (suit.get(0) % 13 == 0) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList(), "Regular"));
+                                if (suit.get(1) % 13 == 12 || suit.get(1) % 13 == 11) {
+                                    tricks.add(new Trick(suit.get(1), new ArrayList(), "Regular"));
+                                }
+                            } else if (suit.get(0) % 13 == 12) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList<>(Arrays.asList(suit.get(suit.size() - 1), suit.get(suit.size() - 2))), "Regular"));
+                            } else if (suit.get(0) % 13 == 11) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList<>(Arrays.asList(suit.get(suit.size() - 1), suit.get(suit.size() - 2))), "Regular"));
+                            } else if (suit.get(0) % 13 == 10) {
+                                tricks.add(new Trick(suit.get(0), new ArrayList<>(Arrays.asList(suit.get(suit.size() - 1), suit.get(suit.size() - 2), suit.get(suit.size() - 3))), "Regular"));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        for (Trick trick1 : tricks) {
+            for (Trick trick2 : tricks) {
+                if (!trick1.equals(trick2)) {
+                    if (trick1.getSacrifices().contains(trick2.getCard())) {
+                        ArrayList<Integer> s = trick1.getSacrifices();
+                        s.remove(s.indexOf(trick2.getCard()));
+                        trick1.setSacrifices(s);
+                    }
+                }
+            }
+        }
+
+        System.out.println("-------------\n" + tricks.size() + " trick(s)");
+        for (Trick trick : tricks) {
+            System.out.println("-------------");
+            System.out.println(translate(trick.getCard()) + " Sacrifices: ");
+            for (int i : trick.getSacrifices()) {
+                System.out.println(translate(i));
+            }
+            System.out.println("-------------");
         }
     }
 
@@ -1074,7 +1497,6 @@ public class Estimation {
 //        }
 //        System.out.println(suitPoints(suit));
 //        int i;
-        
         User u1 = new User("Ahmad");
         User u2 = new User("Negm");
         User u3 = new User("Ramy");
@@ -1085,6 +1507,9 @@ public class Estimation {
         Computer c3 = new Computer("Computer3");
         Computer c4 = new Computer("Computer4");
 
+        ArrayList<Computer> computers = new ArrayList<>(Arrays.asList(c1, c2, c3, c4));
+        testDetermineTrickPaths(computers);
+
 //        u1.incrementScore(21);
 //        u2.incrementScore(-1);
 //        u3.incrementScore(-1);
@@ -1092,7 +1517,7 @@ public class Estimation {
 //        ArrayList<Player> players = new ArrayList<>(Arrays.asList(u1, u2, u3, u4));
 //        Estimation.calculatePositions(players);
 //        Session s1 = new Session(u1, c2, c3, c4);
-        Session s1 = new Session(u1, u2, u3, u4);
+//        Session s1 = new Session(u1, u2, u3, u4);
 //        s1.startSession();
     }
 

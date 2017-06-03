@@ -21,7 +21,7 @@ public class Round {
     private final int roundNumber;
     private ArrayList<Card> lastHand = new ArrayList();
     private ArrayList<Call> roundCalls = new ArrayList();
-//    private ArrayList<Integer> cardPool = new ArrayList();
+    private ArrayList<Integer> cardPool = new ArrayList();
     private ArrayList<Player> players = new ArrayList();
     private Boolean restart = false;
 
@@ -44,6 +44,14 @@ public class Round {
         if (!restart) {
             session.nextRound(this);
         }
+    }
+
+    public ArrayList<Integer> getCardPool() {
+        return cardPool;
+    }
+
+    public void addCardToCardPool(int card) {
+        cardPool.add(card);
     }
 
     public Call getCall() {
@@ -315,7 +323,7 @@ public class Round {
                         } else {
                             players.get(cursor).secondRoundBidding(0, call);
                         }
-                                
+
                     } else {
                         players.get(cursor).secondRoundBidding(call);
                     }
@@ -411,6 +419,7 @@ public class Round {
 
         for (int i = 0; i < 13; i++) {
             int first = players.get(cursor).playCard();
+            cardPool.add(first);
             hand.add(new Card(first, players.get(cursor)));
             cursor = nextCursor(cursor);
 
@@ -421,7 +430,9 @@ public class Round {
             }
 
             for (int j = 0; j < 3; j++) {
-                hand.add(new Card(players.get(cursor).playCard(suit, trumpSuit), players.get(cursor)));
+                int card = players.get(cursor).playCard(suit, trumpSuit);
+                cardPool.add(card);
+                hand.add(new Card(card, players.get(cursor)));
                 cursor = nextCursor(cursor);
             }
             Boolean hasTrumpCard = false;
