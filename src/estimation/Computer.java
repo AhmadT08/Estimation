@@ -16,8 +16,8 @@ import java.util.Scanner;
  * @author Ahmad
  */
 public class Computer extends Player {
-    
-    
+
+    private GameState gameState;
 
     public Computer(String n) {
         super();
@@ -601,10 +601,9 @@ public class Computer extends Player {
     public Call openBidding() {
         Call c = new Call(true);
 
-        System.out.println("\n\n");
-        translate();
-        System.out.println("\n\n");
-
+//        System.out.println("\n\n");
+//        ();
+//        System.out.println("\n\n");
         ArrayList<Integer> h = getHand();
         ArrayList<Integer> masters = new ArrayList();
         int aceCounter = 0;
@@ -888,15 +887,18 @@ public class Computer extends Player {
         if (tricks > 3) {
             if (new Call(tricks, callSuit, false, this).isLargerThan(getRound().getCall())) {
                 c = new Call(tricks, callSuit, false, this);
-                System.out.println("Call is " + tricks + " " + callSuit);
+                System.out.println(name + " calls " + c.getTricks() + " " + c.getSuit());
                 getRound().setCall(c);
             } else if (maxOpenBidding().isLargerThan(getRound().getCall())) {
                 c = maxOpenBidding();
-                System.out.println("Call is " + c.getTricks() + " " + c.getSuit());
+                System.out.println(name + " calls " + c.getTricks() + " " + c.getSuit());
                 getRound().setCall(c);
             }
+        } else {
+            System.out.println(name + " pass");
         }
 
+        c.setCaller(this);
         setCall(c);
         return c;
     }
@@ -994,9 +996,9 @@ public class Computer extends Player {
 
         if (dash == true) {
 //            System.out.println("\t DASHCALL!");
-            System.out.println("\n\n");
-            translate();
-            System.out.println("\n\n");
+//            System.out.println("\n\n");
+//            translate();
+            System.out.println(name + " DASHCALL \n\n");
             setCall(new Call(true, this));
         }
         return dash;
@@ -1056,8 +1058,8 @@ public class Computer extends Player {
 
         Call c = new Call(bid, this, call.getSuit());
         setCall(c);
-        translate();
-        System.out.println(bid + " tricks \n\n");
+//        translate();
+        System.out.println(name + " bid " + bid + " tricks \n\n");
         return c;
     }
 
@@ -1153,8 +1155,8 @@ public class Computer extends Player {
 
         Call c = new Call(bid, this, call.getSuit(), risk);
         setCall(c);
-        translate();
-        System.out.println(bid + " tricks \n\n");
+//        translate();
+        System.out.println(name + " bid " + bid + " tricks \n\n");
         return c;
     }
 
@@ -1208,8 +1210,8 @@ public class Computer extends Player {
 
         Call c = new Call(bid, this, suit.getName());
         setCall(c);
-        translate();
-        System.out.println(bid + " " + suit.getName() + "\n\n");
+//        translate();
+        System.out.println(name + " bid " + bid + " tricks \n\n");
         return c;
     }
 
@@ -1305,19 +1307,33 @@ public class Computer extends Player {
 
         Call c = new Call(bid, this, suit.getName(), risk);
         setCall(c);
-        translate();
-        System.out.println(bid + " tricks \n\n");
+//        translate();
+        System.out.println(name + " bid " + bid + " tricks \n\n");
         return c;
     }
 
     @Override
     public int playCard() {
-        
-        return 0;
+        int card = gameState.playCard(this);
+        System.out.println(name + " played the " + translate(card));
+        removeCardFromHand(card);
+        return card;
     }
 
     @Override
     public int playCard(Suit suit, Suit trumpSuit) {
         return 0;
+    }
+
+    public void setGameState(String state) {
+        switch (state) {
+            case "Over":
+                gameState = new GameOver();
+                break;
+            case "Under":
+                gameState = new GameUnder();
+                break;
+        }
+        gameState.determineTrickPaths(this);
     }
 }

@@ -75,7 +75,7 @@ public class Call {
                 break;
         }
     }
-    
+
     public Call(int tricks, Player p, String suit, int risk) {
         this.tricks = tricks;
         dashCall = false;
@@ -133,8 +133,8 @@ public class Call {
     public String getSuit() {
         return suit.getName();
     }
-    
-    public int getRisk(){
+
+    public int getRisk() {
         return risk;
     }
 
@@ -168,6 +168,10 @@ public class Call {
 
     public Player getCaller() {
         return caller;
+    }
+
+    public void setCaller(Player player) {
+        caller = player;
     }
 
     public String returnLargerSuit(String x, String y) {

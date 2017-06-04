@@ -19,7 +19,7 @@ public class Round {
     private int Multiplier;
     private int dealer;
     private final int roundNumber;
-    private ArrayList<Card> lastHand = new ArrayList();
+    private ArrayList<Integer> lastHand = new ArrayList();
     private ArrayList<Call> roundCalls = new ArrayList();
     private ArrayList<Integer> cardPool = new ArrayList();
     private ArrayList<Player> players = new ArrayList();
@@ -44,6 +44,10 @@ public class Round {
         if (!restart) {
             session.nextRound(this);
         }
+    }
+
+    public ArrayList<Integer> getLastHand() {
+        return lastHand;
     }
 
     public ArrayList<Integer> getCardPool() {
@@ -418,8 +422,9 @@ public class Round {
         Suit suit;
 
         for (int i = 0; i < 13; i++) {
+            lastHand.clear();
             int first = players.get(cursor).playCard();
-            cardPool.add(first);
+            lastHand.add(first);
             hand.add(new Card(first, players.get(cursor)));
             cursor = nextCursor(cursor);
 
@@ -431,8 +436,8 @@ public class Round {
 
             for (int j = 0; j < 3; j++) {
                 int card = players.get(cursor).playCard(suit, trumpSuit);
-                cardPool.add(card);
                 hand.add(new Card(card, players.get(cursor)));
+                lastHand.add(card);
                 cursor = nextCursor(cursor);
             }
             Boolean hasTrumpCard = false;
@@ -447,6 +452,7 @@ public class Round {
 
             for (int k = 0; k < 4; k++) {
                 handCards.add(hand.get(k).number);
+                cardPool.add(hand.get(k).number);
             }
 
             if (hasTrumpCard) {
@@ -457,7 +463,6 @@ public class Round {
                 cursor = players.indexOf(p);
             }
 
-            lastHand = hand;
             hand.clear();
         }
     }
@@ -477,12 +482,6 @@ public class Round {
                 }
 
                 secondRoundBids(nextCursor(players.indexOf(call.getCaller())));
-
-                if (getSumOfBids() > 13) {
-                    System.out.println("Total bids = " + getSumOfBids() + "\nGame state = over " + (getSumOfBids() - 13) + "\n");
-                } else {
-                    System.out.println("Total bids = " + getSumOfBids() + "\nGame state = under " + (13 - getSumOfBids()) + "\n");
-                }
             }
         } else if (roundNumber >= 14) {
             secondRoundBids(cursor);
@@ -505,11 +504,21 @@ public class Round {
 
             call = roundCalls.get(0);
             call.getCaller().setCaller(true);
+        }
 
-            if (getSumOfBids() > 13) {
-                System.out.println("Total bids = " + getSumOfBids() + "\nGame state = over " + (getSumOfBids() - 13) + "\n");
-            } else {
-                System.out.println("Total bids = " + getSumOfBids() + "\nGame state = under " + (13 - getSumOfBids()) + "\n");
+        if (getSumOfBids() > 13) {
+            System.out.println("Total bids = " + getSumOfBids() + "\nGame state = over " + (getSumOfBids() - 13) + "\n");
+            for (Player player : players) {
+                if (player instanceof Computer) {
+                    ((Computer) player).setGameState("Over");
+                }
+            }
+        } else {
+            System.out.println("Total bids = " + getSumOfBids() + "\nGame state = under " + (13 - getSumOfBids()) + "\n");
+            for (Player player : players) {
+                if (player instanceof Computer) {
+                    ((Computer) player).setGameState("Under");
+                }
             }
         }
     }

@@ -13,7 +13,7 @@ import java.util.ArrayList;
  */
 public abstract class GameState {
     
-    public ArrayList<Trick> tricks;
+    protected ArrayList<Trick> tricks;
     
     public abstract int playCard(Computer c1);
     

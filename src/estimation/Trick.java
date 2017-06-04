@@ -6,6 +6,8 @@
 package estimation;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 /**
  *
@@ -16,6 +18,7 @@ public class Trick {
     private int card;
     private ArrayList<Integer> sacrifices = new ArrayList();
     private String type;
+//    private Suit cutSuit;
     private Boolean collected;
 
     public Trick(int card, ArrayList<Integer> sacrifices, String type) {
@@ -48,13 +51,22 @@ public class Trick {
     public void setType(String type) {
         this.type = type;
     }
-    
-    public Boolean isCollected(){
+
+    public Boolean isCollected() {
         return collected;
     }
-    
-    public void setCollected(){
+
+    public void setCollected() {
         collected = true;
+    }
+
+    public void sortSacrifices() {
+        Collections.sort(sacrifices);
+        Collections.reverse(sacrifices);
+    }
+
+    public void removeSacrifice(int card) {
+        sacrifices.remove(new Integer(card));
     }
 
 }
