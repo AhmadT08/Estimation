@@ -19,13 +19,11 @@ public class Trick {
     private ArrayList<Integer> sacrifices = new ArrayList();
     private String type;
 //    private Suit cutSuit;
-    private Boolean collected;
 
     public Trick(int card, ArrayList<Integer> sacrifices, String type) {
         this.card = card;
         this.sacrifices = sacrifices;
         this.type = type;
-        collected = false;
     }
 
     public int getCard() {
@@ -50,14 +48,6 @@ public class Trick {
 
     public void setType(String type) {
         this.type = type;
-    }
-
-    public Boolean isCollected() {
-        return collected;
-    }
-
-    public void setCollected() {
-        collected = true;
     }
 
     public void sortSacrifices() {

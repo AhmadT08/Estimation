@@ -105,6 +105,7 @@ public class User extends Player {
                         System.out.println("Your call is " + number + " " + suits[s - 1]);
                         callInvalid = false;
                         getRound().setCall(c);
+//                        this.setCaller(true);
                     } else {
                         System.out.println("Your call must be larger than " + getRound().getCall().getTricks() + " " + getRound().getCall().getSuit());
                     }

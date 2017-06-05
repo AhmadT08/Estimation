@@ -601,9 +601,9 @@ public class Computer extends Player {
     public Call openBidding() {
         Call c = new Call(true);
 
-//        System.out.println("\n\n");
-//        ();
-//        System.out.println("\n\n");
+        System.out.println("\n\n");
+        translate();
+        System.out.println("\n\n");
         ArrayList<Integer> h = getHand();
         ArrayList<Integer> masters = new ArrayList();
         int aceCounter = 0;
@@ -765,7 +765,7 @@ public class Computer extends Player {
             //        and more than 4 cards,
             //        and the total number of master cards in the hand is greater than 4
             if (temp.equals(spades)) {
-                if (spadeMasters.size() > 2 && temp.size() > 4 && masters.size() > 4) {
+                if (spadeMasters.size() >= 2 && temp.size() > 4 && masters.size() > 4) {
 //                    System.out.println("\t\t\tRule 4");
 //                    System.out.println((determineSuitTricks(temp, 4)));
                     if (determineSuitTricks(temp, 4) > suitTricks) {
@@ -780,7 +780,7 @@ public class Computer extends Player {
 //                    continue;
                 }
             } else if (temp.equals(hearts)) {
-                if (heartMasters.size() > 2 && temp.size() > 4 && masters.size() > 4) {
+                if (heartMasters.size() >= 2 && temp.size() > 4 && masters.size() > 4) {
 //                    System.out.println("\t\t\tRule 4");
 //                    System.out.println((determineSuitTricks(temp, 4)));
                     if (determineSuitTricks(temp, 4) > suitTricks) {
@@ -795,7 +795,7 @@ public class Computer extends Player {
 //                    continue;
                 }
             } else if (temp.equals(diamonds)) {
-                if (diamondMasters.size() > 2 && temp.size() > 4 && masters.size() > 4) {
+                if (diamondMasters.size() >= 2 && temp.size() > 4 && masters.size() > 4) {
 //                    System.out.println("\t\t\tRule 4");
 //                    System.out.println((determineSuitTricks(temp, 4)));
                     if (determineSuitTricks(temp, 4) > suitTricks) {
@@ -809,8 +809,8 @@ public class Computer extends Player {
                     }
 //                    continue;
                 }
-            } else {
-                if (clubMasters.size() > 2 && temp.size() > 4 && masters.size() > 4) {
+            } else if (temp.equals(clubs)) {
+                if (clubMasters.size() >= 2 && temp.size() > 4 && masters.size() > 4) {
 //                    System.out.println("\t\t\tRule 4");
 //                    System.out.println((determineSuitTricks(temp, 4)));
                     if (determineSuitTricks(temp, 4) > suitTricks) {
@@ -867,7 +867,7 @@ public class Computer extends Player {
                         }
                     }
                 }
-            } else {
+            } else if (temp.equals(clubs)) {
                 if (clubMasters.size() >= 2 && temp.size() >= 5) {
 //                    System.out.println("\t\t\tRule 5");
 //                    System.out.println((determineSuitTricks(temp, 5)));
@@ -889,6 +889,8 @@ public class Computer extends Player {
                 c = new Call(tricks, callSuit, false, this);
                 System.out.println(name + " calls " + c.getTricks() + " " + c.getSuit());
                 getRound().setCall(c);
+                Call call = getRound().getCall();
+                
             } else if (maxOpenBidding().isLargerThan(getRound().getCall())) {
                 c = maxOpenBidding();
                 System.out.println(name + " calls " + c.getTricks() + " " + c.getSuit());
@@ -1314,7 +1316,7 @@ public class Computer extends Player {
 
     @Override
     public int playCard() {
-        int card = gameState.playCard(this);
+        int card = gameState.playCard();
         System.out.println(name + " played the " + translate(card));
         removeCardFromHand(card);
         return card;
@@ -1328,12 +1330,11 @@ public class Computer extends Player {
     public void setGameState(String state) {
         switch (state) {
             case "Over":
-                gameState = new GameOver();
+                gameState = new GameOver(this);
                 break;
             case "Under":
-                gameState = new GameUnder();
+                gameState = new GameUnder(this);
                 break;
         }
-        gameState.determineTrickPaths(this);
     }
 }

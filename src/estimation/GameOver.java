@@ -16,14 +16,16 @@ import java.util.HashMap;
  */
 public class GameOver extends GameState {
 
-    public GameOver() {
+    public GameOver(Computer c1) {
+        computer = c1;
         tricks = new ArrayList();
+        determineTrickPaths();
     }
 
     @Override
-    public int playCard(Computer c1) {
+    public int playCard() {
         int card = 0;
-        ArrayList<Integer> h = c1.getHand();
+        ArrayList<Integer> h = computer.getHand();
         ArrayList<Integer> masters = new ArrayList();
         ArrayList<Integer> spades = new ArrayList();
         ArrayList<Integer> spadeMasters = new ArrayList();
@@ -68,11 +70,11 @@ public class GameOver extends GameState {
             }
         }
 
-        if (c1.getTricks() != c1.getCall().getTricks()) {
-            if (c1.isCaller()) {
-                if (c1.getCall().getSuit().equals("Suns")) {
+        if (computer.getTricks() != computer.getCall().getTricks()) {
+            if (computer.isCaller()) {
+                if (computer.getCall().getSuit().equals("Suns")) {
                     for (Trick trick : tricks) {
-                        if (cardWinnable(trick.getCard(), c1)) {
+                        if (cardWinnable(trick.getCard())) {
                             card = trick.getCard();
                             tricks.remove(trick);
                             break;
@@ -87,13 +89,13 @@ public class GameOver extends GameState {
     }
 
     @Override
-    public int playCard(Computer c1, Suit suit, Suit trumpSuit) {
+    public int playCard(Suit suit, Suit trumpSuit) {
         int card = 0;
-        if (c1.isAvoid(suit.getName())) {
+        if (computer.isAvoid(suit.getName())) {
 
         } else {
             for (Trick trick : tricks) {
-                if (Suit.returnSuitByCard(trick.getCard()).equals(suit) && !cardWinnable(trick.getCard(), c1)) {
+                if (Suit.returnSuitByCard(trick.getCard()).equals(suit) && !cardWinnable(trick.getCard())) {
                     ArrayList<Integer> sacrifices = trick.getSacrifices();
                     sacrifices.get(sacrifices.size()-1);
                 }
@@ -103,9 +105,9 @@ public class GameOver extends GameState {
     }
 
     @Override
-    public void determineTrickPaths(Computer c1) {
+    public void determineTrickPaths() {
 
-        ArrayList<Integer> hand = c1.getHand();
+        ArrayList<Integer> hand = computer.getHand();
         Collections.reverse(hand);
         ArrayList<Integer> spades = new ArrayList();
         ArrayList<Integer> spadeMasters = new ArrayList();
@@ -153,9 +155,9 @@ public class GameOver extends GameState {
         suitMap.put(clubs, clubMasters);
 
         for (ArrayList<Integer> suit : handSuits) {
-            if (c1.isCaller()) {
+            if (computer.isCaller()) {
                 if (suit.size() > 0) {
-                    if (Suit.returnSuitByName(c1.getCall().getSuit()).trumpCheck(suit.get(0)) && !c1.getCall().getSuit().equals("Suns")) {
+                    if (Suit.returnSuitByName(computer.getCall().getSuit()).trumpCheck(suit.get(0)) && !computer.getCall().getSuit().equals("Suns")) {
                         if (suitMap.get(suit).size() == 4) {
                             for (int i : suit) {
                                 tricks.add(new Trick(i, new ArrayList(), "Regular"));
@@ -238,7 +240,7 @@ public class GameOver extends GameState {
                                 tricks.add(new Trick(suit.get(0), new ArrayList<>(Arrays.asList(suit.get(1), suit.get(2), suit.get(3))), "Regular"));
                             }
                         }
-                        if (suit.size() >= 5 && !c1.getCall().getSuit().equals("Suns")) {
+                        if (suit.size() >= 5 && !computer.getCall().getSuit().equals("Suns")) {
                             if (suit.get(0) % 13 == 0) {
                                 tricks.add(new Trick(suit.get(0), new ArrayList(), "Regular"));
                                 if (suit.get(1) % 13 == 12) {
@@ -246,7 +248,7 @@ public class GameOver extends GameState {
                                 }
                             }
                         }
-                        if (suit.size() >= 5 && c1.getCall().getSuit().equals("Suns")) {
+                        if (suit.size() >= 5 && computer.getCall().getSuit().equals("Suns")) {
                             if (suit.get(0) % 13 == 0) {
                                 tricks.add(new Trick(suit.get(0), new ArrayList(), "Regular"));
                                 if (suit.get(1) % 13 == 12 || suit.get(1) % 13 == 11) {
@@ -265,7 +267,7 @@ public class GameOver extends GameState {
             } else {
 
                 if (suit.size() > 0) {
-                    if (Suit.returnSuitByName(c1.getCall().getSuit()).trumpCheck(suit.get(0)) && !c1.getCall().getSuit().equals("Suns")) {
+                    if (Suit.returnSuitByName(computer.getCall().getSuit()).trumpCheck(suit.get(0)) && !computer.getCall().getSuit().equals("Suns")) {
                         if (suit.size() == 1) {
                             if (suit.get(0) % 13 == 0) {
                                 tricks.add(new Trick(suit.get(0), new ArrayList(), "Regular"));
@@ -391,7 +393,7 @@ public class GameOver extends GameState {
                                 tricks.add(new Trick(suit.get(0), new ArrayList<>(Arrays.asList(suit.get(1), suit.get(2), suit.get(3))), "Regular"));
                             }
                         }
-                        if (suit.size() >= 5 && !c1.getCall().getSuit().equals("Suns")) {
+                        if (suit.size() >= 5 && !computer.getCall().getSuit().equals("Suns")) {
                             if (suit.get(0) % 13 == 0) {
                                 tricks.add(new Trick(suit.get(0), new ArrayList(), "Regular"));
                                 if (suit.get(1) % 13 == 12) {
@@ -399,7 +401,7 @@ public class GameOver extends GameState {
                                 }
                             }
                         }
-                        if (suit.size() >= 5 && c1.getCall().getSuit().equals("Suns")) {
+                        if (suit.size() >= 5 && computer.getCall().getSuit().equals("Suns")) {
                             if (suit.get(0) % 13 == 0) {
                                 tricks.add(new Trick(suit.get(0), new ArrayList(), "Regular"));
                                 if (suit.get(1) % 13 == 12 || suit.get(1) % 13 == 11) {
@@ -443,7 +445,7 @@ public class GameOver extends GameState {
             }
         }
 
-        if (c1.getCall().getTricks() >= tricks.size()) {
+        if (computer.getCall().getTricks() >= tricks.size()) {
 //            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 //            Estimation.translate(c1.getHand());
 //            System.out.println("-------------\n" + tricks.size() + " trick(s) but " + c1.getCall().getTricks());
@@ -459,8 +461,9 @@ public class GameOver extends GameState {
         }
     }
 
-    public void addCutTricks(Computer c1) {
-        ArrayList<Integer> hand = c1.getHand();
+    @Override
+    public void addCutTricks() {
+        ArrayList<Integer> hand = computer.getHand();
         Collections.reverse(hand);
         ArrayList<Integer> spades = new ArrayList();
         ArrayList<Integer> spadeMasters = new ArrayList();
@@ -491,16 +494,17 @@ public class GameOver extends GameState {
         }
     }
 
-    public Boolean cardWinnable(int card, Computer c1) {
+    @Override
+    public Boolean cardWinnable(int card) {
         Boolean win = false;
         if (card % 13 == 0) {
             win = true;
         } else {
             for (int i = 13 - (card % 13); i > 0; i--) {
-                if (c1.getHand().contains(card + i)) {
+                if (computer.getHand().contains(card + i)) {
 //                    System.out.println((card+i)+" in hand");
                     win = true;
-                } else if (c1.getRound().getCardPool().contains(card + i)) {
+                } else if (computer.getRound().getCardPool().contains(card + i)) {
                     win = true;
                 } else {
                     win = false;
@@ -511,13 +515,14 @@ public class GameOver extends GameState {
         return win;
     }
 
+    @Override
     public void removeSacrifice(Trick trick) {
 
     }
 
-    public Boolean highest(int card, Computer c1) {
+    public Boolean highest(int card) {
         Boolean high = false;
-        for (int i : c1.getRound().getLastHand()) {
+        for (int i : computer.getRound().getLastHand()) {
             if(Suit.returnSuitByCard(card).equals(Suit.returnSuitByCard(i))){
                 if(card > i){
                     high = true;

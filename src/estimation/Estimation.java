@@ -18,6 +18,8 @@ import java.util.Scanner;
  */
 public class Estimation {
 
+    static ArrayList<Player> players = new ArrayList();
+
     public static void translate(ArrayList<Integer> list) {
         Collections.sort(list);
         Collections.reverse(list);
@@ -1472,7 +1474,7 @@ public class Estimation {
 //        u1.addCardToHand(1); u1.addCardToHand(11); u1.addCardToHand(31); u1.addCardToHand(50);
 //        u1.addCardToHand(52);
 //        System.out.println(u1.getHand());
-//        Scanner sc = new Scanner(System.in);
+        Scanner sc = new Scanner(System.in);
 
 //        System.out.println(u1.translate(sc.nextInt()));
 //        ArrayList<Integer> x = new ArrayList();
@@ -1516,19 +1518,26 @@ public class Estimation {
 //        }
 //        System.out.println(suitPoints(suit));
 //        int i;
-        User u1 = new User("Ahmad");
-        User u2 = new User("Negm");
-        User u3 = new User("Ramy");
-        User u4 = new User("Helal");
+        
+//        while(true){
+//            System.out.println(translate(sc.nextInt()));
+//        }
+//        System.out.println("1. Testing \n2. Game\n");
+//        System.out.println("1. Test Dash Call \n2. Test Trump Suit Bid Call\n 3. Test Second Round Bidding\n");
+//        System.out.println("1. Play with users\n 2. Play with computers\n");
+        User u1 = new User("User1");
+        User u2 = new User("User2");
+        User u3 = new User("User3");
+        User u4 = new User("User4");
 //
         Computer c1 = new Computer("Computer1");
         Computer c2 = new Computer("Computer2");
         Computer c3 = new Computer("Computer3");
         Computer c4 = new Computer("Computer4");
 
-        ArrayList<Computer> computers = new ArrayList<>(Arrays.asList(c1, c2, c3, c4));
-//        testDetermineTrickPaths(computers);
+//        ArrayList<Computer> computers = new ArrayList<>(Arrays.asList(c1, c2, c3, c4));
 
+//        testDetermineTrickPaths(computers);
 //        u1.incrementScore(21);
 //        u2.incrementScore(-1);
 //        u3.incrementScore(-1);
@@ -1536,6 +1545,7 @@ public class Estimation {
 //        ArrayList<Player> players = new ArrayList<>(Arrays.asList(u1, u2, u3, u4));
 //        Estimation.calculatePositions(players);
         Session s1 = new Session(u1, c2, c3, c4);
+//        players = new ArrayList<>(Arrays.asList(u1, c2, c3, c4));
 //        Session s1 = new Session(u1, u2, u3, u4);
         s1.startSession();
     }

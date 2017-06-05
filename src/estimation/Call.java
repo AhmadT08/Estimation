@@ -38,7 +38,7 @@ public class Call {
             case "Spades":
                 this.suit = new Spades();
                 break;
-            case "Suns":
+            default:
                 this.suit = new Suns();
                 break;
         }
@@ -70,7 +70,7 @@ public class Call {
             case "Spades":
                 this.suit = new Spades();
                 break;
-            case "Suns":
+            default:
                 this.suit = new Suns();
                 break;
         }
@@ -96,13 +96,14 @@ public class Call {
             case "Spades":
                 this.suit = new Spades();
                 break;
-            case "Suns":
+            default:
                 this.suit = new Suns();
                 break;
         }
     }
 
     public Call(int tricks, Player p) {
+        this.suit = new Suns();
         this.tricks = tricks;
         dashCall = false;
         pass = true; //used to be pass = false;
@@ -110,6 +111,7 @@ public class Call {
     }
 
     public Call(Boolean dash, Player p) {
+        this.suit = new Suns();
         this.tricks = 0;
         dashCall = true;
         pass = true;
@@ -117,6 +119,7 @@ public class Call {
     }
 
     public Call(Boolean p) {
+        this.suit = new Suns();
         tricks = 0;
         dashCall = false;
         pass = true;

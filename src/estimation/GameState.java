@@ -14,10 +14,17 @@ import java.util.ArrayList;
 public abstract class GameState {
     
     protected ArrayList<Trick> tricks;
+    protected Computer computer;
     
-    public abstract int playCard(Computer c1);
+    public abstract int playCard();
     
-    public abstract int playCard(Computer c1, Suit suit, Suit trumpSuit);
+    public abstract int playCard(Suit suit, Suit trumpSuit);
     
-    public abstract void determineTrickPaths(Computer c1);
+    public abstract void determineTrickPaths();
+    
+    public abstract void addCutTricks();
+    
+    public abstract void removeSacrifice(Trick trick);
+    
+    public abstract Boolean cardWinnable(int card);
 }

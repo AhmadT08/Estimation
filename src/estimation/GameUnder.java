@@ -13,22 +13,38 @@ import java.util.ArrayList;
  */
 public class GameUnder extends GameState{
     
-    public GameUnder(){
+    public GameUnder(Computer c1){
+        computer = c1;
         tricks = new ArrayList();
-    }
-            
-    public int playCard (Computer c1){
-        
-        return 0;
     }
 
     @Override
-    public int playCard(Computer c1, Suit suit, Suit trumpSuit) {
+    public int playCard() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void determineTrickPaths(Computer c1) {
+    public int playCard(Suit suit, Suit trumpSuit) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void determineTrickPaths() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void addCutTricks() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void removeSacrifice(Trick trick) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Boolean cardWinnable(int card) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

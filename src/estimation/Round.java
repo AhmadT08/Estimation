@@ -34,15 +34,36 @@ public class Round {
     }
 
     public void startRound(int cursor) {
-        dealer = cursor;
-        deal(players);
-        setPlayerRounds();
-        startBidding(cursor);
-        startPlay(players.indexOf(call.getCaller()));
-        winLoss();
-        calculateScores();
-        if (!restart) {
-            session.nextRound(this);
+        if (restart) {
+            setPlayerRounds();
+            startBidding(cursor);
+            startPlay(players.indexOf(call.getCaller()));
+            winLoss();
+            calculateScores();
+            if (!restart) {
+                session.nextRound(this);
+            }
+        } else {
+            clearPlayerState();
+            dealer = cursor;
+            deal(players);
+            setPlayerRounds();
+            startBidding(cursor);
+            startPlay(players.indexOf(call.getCaller()));
+            winLoss();
+            calculateScores();
+            if (!restart) {
+                session.nextRound(this);
+            }
+        }
+    }
+
+    public void clearPlayerState() {
+        roundCalls = new ArrayList();
+        call = new Call(true);
+        for (Player p : players) {
+            p.clearHand();
+            p.clearTricks();
         }
     }
 
@@ -472,7 +493,12 @@ public class Round {
             dashCall(cursor);
             call = collectBids(cursor);
             if (!restart) {
-                call.getCaller().setCaller(true);
+
+                try {
+                    call.getCaller().setCaller(true);
+                } catch (Exception E) {
+                    startRound(dealer);
+                }
 
                 for (Player p : players) {
                     if (!p.isCaller()) {
@@ -508,18 +534,10 @@ public class Round {
 
         if (getSumOfBids() > 13) {
             System.out.println("Total bids = " + getSumOfBids() + "\nGame state = over " + (getSumOfBids() - 13) + "\n");
-            for (Player player : players) {
-                if (player instanceof Computer) {
-                    ((Computer) player).setGameState("Over");
-                }
-            }
+            setPlayerState("Over");
         } else {
             System.out.println("Total bids = " + getSumOfBids() + "\nGame state = under " + (13 - getSumOfBids()) + "\n");
-            for (Player player : players) {
-                if (player instanceof Computer) {
-                    ((Computer) player).setGameState("Under");
-                }
-            }
+            setPlayerState("Under");
         }
     }
 
@@ -647,5 +665,13 @@ public class Round {
         for (int i = 0; i < 4; i++) {
             playerArray[i].setPosition(i);
         }
+    }
+    
+    public void setPlayerState(String state){
+        for (Player player : players) {
+                if (player instanceof Computer) {
+                    ((Computer) player).setGameState(state);
+                }
+            }
     }
 }
