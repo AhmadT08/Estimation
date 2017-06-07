@@ -601,9 +601,9 @@ public class Computer extends Player {
     public Call openBidding() {
         Call c = new Call(true);
 
-        System.out.println("\n\n");
-        translate();
-        System.out.println("\n\n");
+//        System.out.println("\n\n");
+//        translate();
+//        System.out.println("\n\n");
         ArrayList<Integer> h = getHand();
         ArrayList<Integer> masters = new ArrayList();
         int aceCounter = 0;
@@ -889,8 +889,6 @@ public class Computer extends Player {
                 c = new Call(tricks, callSuit, false, this);
                 System.out.println(name + " calls " + c.getTricks() + " " + c.getSuit());
                 getRound().setCall(c);
-                Call call = getRound().getCall();
-                
             } else if (maxOpenBidding().isLargerThan(getRound().getCall())) {
                 c = maxOpenBidding();
                 System.out.println(name + " calls " + c.getTricks() + " " + c.getSuit());
@@ -1316,15 +1314,21 @@ public class Computer extends Player {
 
     @Override
     public int playCard() {
+        if (getCall().getTricks() == getTricks()) {
+            setGameState("Under");
+        }
         int card = gameState.playCard();
-        System.out.println(name + " played the " + translate(card));
+        System.out.println("\n\t" + name + " played the " + translate(card));
         removeCardFromHand(card);
         return card;
     }
 
     @Override
     public int playCard(Suit suit, Suit trumpSuit) {
-        return 0;
+        int card = gameState.playCard(suit, trumpSuit);
+        System.out.println("\t" + name + " played the " + translate(card));
+        removeCardFromHand(card);
+        return card;
     }
 
     public void setGameState(String state) {
@@ -1336,5 +1340,6 @@ public class Computer extends Player {
                 gameState = new GameUnder(this);
                 break;
         }
+        gameState.determineTrickPaths();
     }
 }

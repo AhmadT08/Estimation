@@ -20,15 +20,21 @@ public class Session {
     private ArrayList<Round> roundList = new ArrayList();
     private final ArrayList<Player> players = new ArrayList(4);
 
-    public Session(Player p1, Player p2, Player p3, Player p4) {
+    public Session(Player p1, Player p2, Player p3, Player p4) throws InterruptedException {
         players.add(p1);
         players.add(p2);
         players.add(p3);
         players.add(p4);
         this.multiplier = 0;
+        System.out.println("\nSession starting in...");
+        for (int i = 3; i > 0; i--) {
+            System.out.println(i);
+            Thread.sleep(1000);
+        }
+        System.out.println("\n-------------------------------------\n");
     }
 
-    public void startSession() {
+    public void startSession() throws InterruptedException {
         setPlayerSession();
         roundNumber = 1;
         currentRound = new Round(0, players, this, roundNumber);
@@ -42,7 +48,7 @@ public class Session {
         }
     }
 
-    public void restartRound(int multi) {
+    public void restartRound(int multi) throws InterruptedException {
         System.out.println("Round restarted");
         clearPlayerState();
         currentRound = new Round(multi + 2, players, this, roundNumber);
@@ -54,7 +60,7 @@ public class Session {
         currentRound.startRound(dealer);
     }
 
-    public void nextRound(Round previousRound) {
+    public void nextRound(Round previousRound) throws InterruptedException {
         roundList.add(previousRound);
         if (roundNumber == 18) {
             endSession();

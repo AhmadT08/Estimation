@@ -7,6 +7,7 @@ package estimation;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -113,6 +114,7 @@ public abstract class Suit {
 
     public static Suit returnSuitByCard(int card) {
         Suit suit = null;
+        
         if (card > 0 && card < 14) {
             suit = new Clubs();
         } else if (card > 13 && card < 27) {
@@ -121,6 +123,8 @@ public abstract class Suit {
             suit = new Hearts();
         } else if (card > 39 && card < 53) {
             suit = new Spades();
+        } else {
+            JOptionPane.showMessageDialog(null, card);
         }
         return suit;
     }
@@ -143,6 +147,8 @@ public abstract class Suit {
             case "Suns":
                 suit = new Suns();
                 break;
+            default:
+                JOptionPane.showMessageDialog(null, name);
         }
         return suit;
     }

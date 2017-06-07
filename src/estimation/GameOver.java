@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -19,13 +20,12 @@ public class GameOver extends GameState {
     public GameOver(Computer c1) {
         computer = c1;
         tricks = new ArrayList();
-        determineTrickPaths();
     }
 
     @Override
     public int playCard() {
         int card = 0;
-        ArrayList<Integer> h = computer.getHand();
+        ArrayList<Integer> hand = computer.getHand();
         ArrayList<Integer> masters = new ArrayList();
         ArrayList<Integer> spades = new ArrayList();
         ArrayList<Integer> spadeMasters = new ArrayList();
@@ -37,8 +37,8 @@ public class GameOver extends GameState {
         ArrayList<Integer> clubMasters = new ArrayList();
         ArrayList<ArrayList> handSuits = new ArrayList<>(Arrays.asList(spades, hearts, diamonds, clubs));
 
-        for (int i = 0; i < h.size(); i++) { //Organize hand into suits
-            int card1 = h.get(i); //Get next card
+        for (int i = 0; i < hand.size(); i++) { //Organize hand into suits
+            int card1 = hand.get(i); //Get next card
 
             if ((card1 - 1) / 13 == 0) { //Check if card is in the first 13 cards of the deck (Clubs)
                 clubs.add(card1);
@@ -70,45 +70,139 @@ public class GameOver extends GameState {
             }
         }
 
-        if (computer.getTricks() != computer.getCall().getTricks()) {
-            if (computer.isCaller()) {
-                if (computer.getCall().getSuit().equals("Suns")) {
-                    for (Trick trick : tricks) {
-                        if (cardWinnable(trick.getCard())) {
-                            card = trick.getCard();
-                            tricks.remove(trick);
-                            break;
-                        }
+        if (computer.isCaller()) {
+            if (computer.getCall().getSuit().equals("Suns")) {
+                for (Trick trick : tricks) {
+                    if (cardWinnable(trick.getCard())) {
+                        card = trick.getCard();
+                        tricks.remove(trick);
+                        break;
+                    }
+                }
+            } else {
+                for (Trick trick : tricks) {
+                    if (cardWinnable(trick.getCard())) {
+                        card = trick.getCard();
+                        tricks.remove(trick);
+                        break;
+                    }
+                }
+            }
+        } else {
+            if (computer.getCall().getSuit().equals("Suns")) {
+                for (Trick trick : tricks) {
+                    if (cardWinnable(trick.getCard())) {
+                        card = trick.getCard();
+                        tricks.remove(trick);
+                        break;
+                    }
+                }
+            } else {
+                for (Trick trick : tricks) {
+                    if (cardWinnable(trick.getCard())) {
+                        card = trick.getCard();
+                        tricks.remove(trick);
+                        break;
                     }
                 }
             }
         }
 
-        return tricks.get(0).getCard();
+        if (card == 0) {
+            outer:
+            for (Trick trick : tricks) {
+                for (int i : hand) {
+                    if (!trick.getSacrifices().contains(i)) {
+                        card = i;
+                        break outer;
+                    }
+                }
+            }
+        }
 
+        if (card == 0) {
+            card = hand.get(hand.size() - 1);
+        }
+
+        return card;
     }
 
     @Override
     public int playCard(Suit suit, Suit trumpSuit) {
-        int card = 0;
-        if (computer.isAvoid(suit.getName())) {
+        ArrayList<Integer> hand = computer.getHand();
+        ArrayList<Integer> spades = new ArrayList();
+        ArrayList<Integer> hearts = new ArrayList();
+        ArrayList<Integer> diamonds = new ArrayList();
+        ArrayList<Integer> clubs = new ArrayList();
+        HashMap<String, ArrayList<Integer>> suitMap = new HashMap();
+        suitMap.put("Spades", spades);
+        suitMap.put("Hearts", hearts);
+        suitMap.put("Diamonds", diamonds);
+        suitMap.put("Clubs", clubs);
 
-        } else {
-            for (Trick trick : tricks) {
-                if (Suit.returnSuitByCard(trick.getCard()).equals(suit) && !cardWinnable(trick.getCard())) {
-                    ArrayList<Integer> sacrifices = trick.getSacrifices();
-                    sacrifices.get(sacrifices.size()-1);
-                }
+        for (int i = 0; i < hand.size(); i++) { //Organize hand into suits
+            int card1 = hand.get(i); //Get next card
+
+            if ((card1 - 1) / 13 == 0) { //Check if card is in the first 13 cards of the deck (Clubs)
+                clubs.add(card1);
+            }
+            if ((card1 - 1) / 13 == 1) {
+                diamonds.add(card1);
+            }
+            if ((card1 - 1) / 13 == 2) {
+                hearts.add(card1);
+            }
+            if ((card1 - 1) / 13 == 3) {
+                spades.add(card1);
             }
         }
-        return 0;
+
+        int card = 0;
+
+        if (computer.isAvoid(suit.getName())) {
+            outer:
+            for (Trick trick : tricks) {
+                for (int i : hand) {
+                    if (!trick.getSacrifices().contains(i) && trick.getCard() != i) {
+                        card = i;
+                        break outer;
+                    }
+                }
+            }
+            int i = hand.size() - 1;
+            while (computer.getCall().getTricks() == computer.getTricks() && trumpSuit.trumpCheck(card)) {
+                card = i;
+                i--;
+            }
+        } else {
+            for (Trick trick : tricks) {
+                if (Suit.returnSuitByCard(trick.getCard()).getName().equals(suit.getName()) && !cardWinnable(trick.getCard())) {
+                    ArrayList<Integer> sacrifices = trick.getSacrifices();
+                    if (sacrifices.isEmpty()) {
+                        card = trick.getCard();
+                    } else {
+                        card = sacrifices.get(sacrifices.size() - 1);
+                        sacrifices.remove(new Integer(card));
+                    }
+                }
+            }
+            if (card == 0) {
+                ArrayList<Integer> temp = suitMap.get(suit.getName());
+                card = temp.get(temp.size() - 1);
+            }
+        }
+
+        if (card == 0) {
+            card = hand.get(hand.size() - 1);
+        }
+
+        return card;
     }
 
     @Override
     public void determineTrickPaths() {
 
         ArrayList<Integer> hand = computer.getHand();
-        Collections.reverse(hand);
         ArrayList<Integer> spades = new ArrayList();
         ArrayList<Integer> spadeMasters = new ArrayList();
         ArrayList<Integer> hearts = new ArrayList();
@@ -445,20 +539,18 @@ public class GameOver extends GameState {
             }
         }
 
-        if (computer.getCall().getTricks() >= tricks.size()) {
+//        if (computer.getCall().getTricks() > tricks.size()) {
 //            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-//            Estimation.translate(c1.getHand());
-//            System.out.println("-------------\n" + tricks.size() + " trick(s) but " + c1.getCall().getTricks());
-//            for (Trick trick : tricks) {
-//                System.out.println("-------------");
-//                System.out.println(translate(trick.getCard()) + " Sacrifices: ");
-//                for (int i : trick.getSacrifices()) {
-//                    System.out.println(translate(i));
-//                }
-//                System.out.println("-------------");
-//            }
-
-        }
+////            Estimation.translate(c1.getHand());
+//            System.out.println("-------------\n" + tricks.size() + " trick(s) but " + computer.getCall().getTricks());
+////            for (Trick trick : tricks) {
+////                System.out.println("-------------");
+////                System.out.println(translate(trick.getCard()) + " Sacrifices: ");
+////                for (int i : trick.getSacrifices()) {
+////                    System.out.println(translate(i));
+////                }
+////                System.out.println("-------------");
+//        }
     }
 
     @Override
@@ -523,8 +615,8 @@ public class GameOver extends GameState {
     public Boolean highest(int card) {
         Boolean high = false;
         for (int i : computer.getRound().getLastHand()) {
-            if(Suit.returnSuitByCard(card).equals(Suit.returnSuitByCard(i))){
-                if(card > i){
+            if (Suit.returnSuitByCard(card).equals(Suit.returnSuitByCard(i))) {
+                if (card > i) {
                     high = true;
                 } else {
                     high = false;

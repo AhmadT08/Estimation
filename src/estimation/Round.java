@@ -7,6 +7,7 @@ package estimation;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -33,8 +34,9 @@ public class Round {
         roundNumber = rn;
     }
 
-    public void startRound(int cursor) {
+    public void startRound(int cursor) throws InterruptedException {
         if (restart) {
+            deal(players);
             setPlayerRounds();
             startBidding(cursor);
             startPlay(players.indexOf(call.getCaller()));
@@ -64,6 +66,7 @@ public class Round {
         for (Player p : players) {
             p.clearHand();
             p.clearTricks();
+
         }
     }
 
@@ -184,17 +187,20 @@ public class Round {
         }
     }
 
-    public void dashCall(int cursor) {
+    public void dashCall(int cursor) throws InterruptedException {
         int i = 0;
         int dashCounter = 0;
 
         while (i < 4) {
+            Thread.sleep(60);
             if (dashCounter == 2) { //only two dash calls are allowed per round
                 setMultiplier(getMultiplier() + 2); //when two players bid dash call in one round, 
                 break;                            //the score multiplier increases by 2
             } else {
                 if (players.get(cursor).dashCall()) {
+                    Thread.sleep(60);
                     roundCalls.add(players.get(cursor).getCall());
+                    Thread.sleep(60);
                     dashCounter++;
                     System.out.println(players.get(cursor).name + " Dash call!");
                 }
@@ -206,7 +212,7 @@ public class Round {
         }
     }
 
-    public Call collectBids(int cursor) {
+    public Call collectBids(int cursor) throws InterruptedException {
         int i = 0;
         int passCounter = 0;
         Call x = new Call(true);
@@ -220,9 +226,10 @@ public class Round {
                 i++;
             } else {
                 Call c = players.get(cursor).openBidding();
-
+                Thread.sleep(60);
                 roundCalls.add(c);
 
+                Thread.sleep(60);
                 if (c.isPassed()) {
                     passCounter++;
                 } else {
@@ -232,6 +239,7 @@ public class Round {
                 cursor = nextCursor(cursor);
 
                 i++;
+                Thread.sleep(60);
             }
         }
 
@@ -243,7 +251,6 @@ public class Round {
         } else {
             x = bidCalls.get(0);
         }
-
         if (roundNumber >= 14) {
             for (int j = 0; j < 4; j++) {
                 if (roundCalls.get(j).getCaller().equals(x.getCaller())) {
@@ -281,6 +288,7 @@ public class Round {
                 }
             }
         }
+
         return c;
     }
 
@@ -416,7 +424,7 @@ public class Round {
         }
 
         p.addTrick();
-        System.out.println("\t" + p.getName() + " wins the hand with the " + p.translate(card) + "\n");
+        System.out.println("\t\t" + p.getName() + " wins the hand with the " + p.translate(card) + "\n");
 
         return p;
     }
@@ -433,7 +441,7 @@ public class Round {
         }
     }
 
-    public void startPlay(int cursor) {
+    public void startPlay(int cursor) throws InterruptedException {
         System.out.println("Round has started. Score Multiplier = [x" + Multiplier + "]\n" + call.getCaller().getName() + " starts.");
 
         ArrayList<Card> hand = new ArrayList();
@@ -456,6 +464,7 @@ public class Round {
             }
 
             for (int j = 0; j < 3; j++) {
+                Thread.sleep(1000);
                 int card = players.get(cursor).playCard(suit, trumpSuit);
                 hand.add(new Card(card, players.get(cursor)));
                 lastHand.add(card);
@@ -476,6 +485,8 @@ public class Round {
                 cardPool.add(hand.get(k).number);
             }
 
+            System.out.println();
+
             if (hasTrumpCard) {
                 Player p = determineHandWinner(trumpSuit.compareWeight(handCards), hand);
                 cursor = players.indexOf(p);
@@ -488,7 +499,7 @@ public class Round {
         }
     }
 
-    public void startBidding(int cursor) {
+    public void startBidding(int cursor) throws InterruptedException {
         if (roundNumber < 14) {
             dashCall(cursor);
             call = collectBids(cursor);
@@ -541,7 +552,7 @@ public class Round {
         }
     }
 
-    public void calculateScores() {
+    public void calculateScores() throws InterruptedException {
         int multiplier;
         int winners = 0;
         int losers = 0;
@@ -666,12 +677,12 @@ public class Round {
             playerArray[i].setPosition(i);
         }
     }
-    
-    public void setPlayerState(String state){
+
+    public void setPlayerState(String state) {
         for (Player player : players) {
-                if (player instanceof Computer) {
-                    ((Computer) player).setGameState(state);
-                }
+            if (player instanceof Computer) {
+                ((Computer) player).setGameState(state);
             }
+        }
     }
 }

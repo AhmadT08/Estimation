@@ -10,12 +10,13 @@ package estimation;
  * @author Ahmad
  */
 public class Card {
+
     public int number;
     public Player player;
-    
-    Card(int n, Player p){
+
+    Card(int n, Player p) {
         number = n;
         player = p;
     }
-    
+
 }

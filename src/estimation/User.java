@@ -69,7 +69,7 @@ public class User extends Player {
 
         while (callInvalid) {
             if (!getCall().isDashCall()) { //a bid can only be made if the player has not called dash call
-                System.out.println("Make a bid of number greater than 3 + suit. Input 'Pass' to pass.");
+                System.out.println("Input 'Pass' to pass. Input anything else to bid.");
                 Scanner sc = new Scanner(System.in);
                 String x = sc.nextLine();
 
@@ -90,7 +90,7 @@ public class User extends Player {
 
                     int s = 0;
                     String[] suits = {"Suns", "Spades", "Hearts", "Diamonds", "Clubs"};
-                    System.out.println("Choose a suit: \n1) Suns. \n2) Spades. \n3) Hearts. \n4) Diamonds. \n5) Clubs.\n");
+                    System.out.println("Choose a suit: \n1) Suns \n2) Spades \n3) Hearts \n4) Diamonds \n5) Clubs\n");
                     while (s < 1 || s > 5) {
                         System.out.println("Please choose a number between 1 and 5");
 
@@ -274,7 +274,7 @@ public class User extends Player {
 
             }
         }
-        System.out.println(name + " played the " + translate(result));
+        System.out.println("\n\t" + name + " played the " + translate(result));
         removeCardFromHand(result);
         return result;
     }
@@ -329,7 +329,7 @@ public class User extends Player {
                 }
             }
         }
-        System.out.println(name + " played the " + translate(result) + "\n");
+        System.out.println("\t" + name + " played the " + translate(result) + "\n");
         removeCardFromHand(result);
         return result;
     }

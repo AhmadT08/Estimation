@@ -25,5 +25,5 @@ public class Clubs extends Suit {
     public String getName() {
         return "Clubs";
     }
-    
+
 }

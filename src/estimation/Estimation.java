@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  *
@@ -623,9 +624,15 @@ public class Estimation {
         }
 //        System.out.println(tricks + " " + callSuit);
 
-//        if (tricks > 3) {
-//            c = new Call(tricks, callSuit, false, new Player());
-//        }
+        if (tricks > 3) {
+            c = new Call(tricks, callSuit, false, new User("s"));
+
+            System.out.println("-------------------------------");
+            translate(hand);
+            System.out.println("\tMaximum Call: " + tricks + " " + callSuit);
+            System.out.println("-------------------------------");
+        }
+
         return c;
     }
 
@@ -1079,7 +1086,8 @@ public class Estimation {
 
     public static int testDashCall() {
         int dashCounter = 0;
-        for (int i = 0; i < 500; i++) {
+        int number = 250;
+        for (int i = 0; i < number; i++) {
             ArrayList<ArrayList<Integer>> lists = Deal();
 
             for (ArrayList<Integer> list : lists) {
@@ -1088,27 +1096,59 @@ public class Estimation {
                 }
             }
         }
+
+        System.out.println(dashCounter + " dash calls in " + number + " hands.\n");
+
         return dashCounter;
     }
 
-    public static void testOpenBidding(ArrayList<Integer> hand) {
-        for (int i = 0; i < 100; i++) {
-//            ArrayList<ArrayList<Integer>> lists = Deal();
-            ArrayList<ArrayList<Integer>> lists = new ArrayList();
+    public static void testOpenBidding() {
+        for (int i = 0; i < 10; i++) {
+            ArrayList<ArrayList<Integer>> lists = Deal();
+//            ArrayList<ArrayList<Integer>> lists = new ArrayList();
 
             for (ArrayList<Integer> list : lists) {
                 openBidding(list);
+                maxOpenBidding(list);
             }
         }
     }
 
-    public static void testDetermineTrickPaths(ArrayList<Computer> computers) {
+    public static void testDetermineTrickPaths() {
+        Computer c1 = new Computer("Computer1");
+        Computer c2 = new Computer("Computer2");
+        Computer c3 = new Computer("Computer3");
+        Computer c4 = new Computer("Computer4");
+        ArrayList<Computer> computers = new ArrayList<>(Arrays.asList(c1, c2, c3, c4));
+        String suit = "";
+        int random = ThreadLocalRandom.current().nextInt(0, 5);
+        switch (random) {
+            case 0:
+                suit = "Suns";
+                break;
+            case 1:
+                suit = "Spades";
+                break;
+            case 2:
+                suit = "Hearts";
+                break;
+            case 3:
+                suit = "Diamonds";
+                break;
+            case 4:
+                suit = "Clubs";
+                break;
+        }
+        System.out.println("The trump suit is " + suit + "\n");
+
         deal(computers);
         for (int i = 0; i < computers.size(); i++) {
             Computer computer = computers.get(i);
             System.out.println("----------------------------------------");
             translate(computer.getHand());
-            computer.getCall().setSuit("Spades");
+
+            computer.getCall().setSuit(suit);
+
             computer.setCaller(false);
             computers.get(3).setCaller(true);
             determineTrickPaths(computer);
@@ -1441,6 +1481,19 @@ public class Estimation {
             trick1.sortSacrifices();
         }
 
+        for (Trick trick1 : tricks) {
+            for (Trick trick2 : tricks) {
+                if (!trick1.equals(trick2)) {
+                    if (trick1.getSacrifices().contains(trick2.getCard())) {
+                        ArrayList<Integer> s = trick1.getSacrifices();
+                        s.remove(s.indexOf(trick2.getCard()));
+                        trick1.setSacrifices(s);
+                    }
+                }
+            }
+            trick1.sortSacrifices();
+        }
+
         for (int i = 0; i < tricks.size(); i++) {
             for (int j = 0; j < tricks.size(); j++) {
                 if (!tricks.get(i).equals(tricks.get(j))) {
@@ -1456,98 +1509,140 @@ public class Estimation {
         System.out.println("-------------\n" + tricks.size() + " trick(s)");
         for (Trick trick : tricks) {
             System.out.println("-------------");
-            System.out.println(translate(trick.getCard()) + " Sacrifices: ");
+            if (trick.getSacrifices().isEmpty()) {
+                System.out.println(translate(trick.getCard()));
+            } else {
+                System.out.println(translate(trick.getCard()) + " Sacrifices: ");
+            }
+
             for (int i : trick.getSacrifices()) {
                 System.out.println(translate(i));
             }
             System.out.println("-------------");
         }
-        if (c1.getCall().getTricks() > tricks.size()) {
-            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    }
+
+    public static void testingSuite(Scanner sc) throws InterruptedException {
+        System.out.println("\n\tTesting Suite\n");
+        System.out.println("\nPlease choose a number from the following:\n");
+        System.out.println("1. Test Dash Call \n2. Test Trump Suit Bid Call \n3. Test Trick Determination \n4. Previous Menu \n5. Exit \n");
+        String choice = sc.nextLine();
+        Boolean invalid = true;
+
+        while (invalid) {
+            switch (choice) {
+                case "1":
+                    invalid = false;
+                    System.out.println("\nThe test function will iterate through 250 hands of 13 cards. \nAny hands that are declared as dash call will be displayed.\n");
+                    Thread.sleep(6000);
+                    testDashCall();
+                    testingSuite(sc);
+                    break;
+                case "2":
+                    invalid = false;
+                    System.out.println("\nThe test function will iterate through 40 hands of 13 cards. \nAny hands that can produce a call will be displayed.\n");
+                    System.out.println("Each hand will go through two methods. \nThe first method determines the minimum call for a hand. \nThe second method determines the maximum call for a hand.\n");
+                    Thread.sleep(8000);
+                    testOpenBidding();
+                    testingSuite(sc);
+                    break;
+                case "3":
+                    invalid = false;
+                    System.out.println("\nThe test function will iterate through 4 hands of 13 cards. \nA trump suit will be chosen at random.\n");
+                    System.out.println("Each player will decide on a set of tricks and their sacrifices. \nEach trick and its sacrifices will be displayed.\n");
+                    Thread.sleep(8000);
+                    testDetermineTrickPaths();
+                    testingSuite(sc);
+                    break;
+                case "4":
+                    invalid = false;
+                    main(new String[2]);
+                    break;
+                case "5":
+                    invalid = false;
+                    break;
+                default:
+                    System.out.println("\nPlease enter either a number from 1 to 5\n");
+                    choice = sc.nextLine();
+                    break;
+            }
         }
     }
 
-    public static void main(String[] args) {
-//        User u1 = new User("Ahmad");
-//        u1.addCardToHand(5); u1.addCardToHand(12); u1.addCardToHand(42); u1.addCardToHand(51);
-//        u1.addCardToHand(16); u1.addCardToHand(9); u1.addCardToHand(41); u1.addCardToHand(21);
-//        u1.addCardToHand(1); u1.addCardToHand(11); u1.addCardToHand(31); u1.addCardToHand(50);
-//        u1.addCardToHand(52);
-//        System.out.println(u1.getHand());
+    public static void playEstimation(Scanner sc) throws InterruptedException {
+        System.out.println("\n\tPlay Estimation\n");
+        System.out.println("\nPlease choose a number from the following:\n");
+        System.out.println("1. Play with users \n2. Play with computers \n3. Previous Menu \n4. Exit \n");
+        String choice = sc.nextLine();
+        Boolean invalid = true;
+        Session currentSession;
+        User u1 = new User("User1");
+
+        while (invalid) {
+            switch (choice) {
+                case "1":
+                    invalid = false;
+                    User u2 = new User("User2");
+                    User u3 = new User("User3");
+                    User u4 = new User("User4");
+                    currentSession = new Session(u1, u2, u3, u4);
+                    currentSession.startSession();
+                    break;
+                case "2":
+                    invalid = false;
+                    Computer c2 = new Computer("Computer2");
+                    Computer c3 = new Computer("Computer3");
+                    Computer c4 = new Computer("Computer4");
+                    currentSession = new Session(u1, c2, c3, c4);
+                    currentSession.startSession();
+                    break;
+                case "3":
+                    invalid = false;
+                    main(new String[2]);
+                    break;
+                case "4":
+                    invalid = false;
+                    break;
+                default:
+                    System.out.println("\nPlease enter either a number from 1 to 4\n");
+                    choice = sc.nextLine();
+                    break;
+            }
+        }
+    }
+
+    public static void start() throws InterruptedException {
         Scanner sc = new Scanner(System.in);
 
-//        System.out.println(u1.translate(sc.nextInt()));
-//        ArrayList<Integer> x = new ArrayList();
-//        Spades s = new Spades();
-//        Diamonds d = new Diamonds();
-//        Hearts h = new Hearts();
-//        Clubs c = new Clubs();
-//        
-//        x.add(38);
-//        x.add(12);
-//        x.add(26);
-//        x.add(11);
-//        Collections.sort(x);
-//        System.out.println(s.compareWeight(x, c));
-//        ArrayList<Integer> suit = new ArrayList<>(Arrays.asList(2, 15, 16, 17, 33, 34, 36, 39, 46, 45, 49, 50, 52));
-//        for (int j = 0; j < 20; j++) {
-//            System.out.println("\n\n\n");
-//            ArrayList<Integer> suit = new ArrayList();
-//
-//            ArrayList<Integer> cards = new ArrayList(52);
-//            for (int i = 1; i < 53; i++) {
-//                cards.add(i);
-//            }
-//
-//            Collections.shuffle(cards);
-//
-//            for (int i = 0; i < 13; i++) {
-//                suit.add(cards.get(i));
-//            }
-//
-//            Collections.sort(suit);
-//            Translate(suit);
-//            Call c = openBidding(suit);
-//            if (!c.isPassed()) {
-//                System.out.println("\t\t\t"+c.getTricks() + " " + c.getSuit());
-//            }
-//            c = maxOpenBidding(suit);
-//            if (!c.isPassed()) {
-//                System.out.println("\t\t\t"+c.getTricks() + " " + c.getSuit());
-//            }
-//        }
-//        System.out.println(suitPoints(suit));
-//        int i;
-        
-//        while(true){
-//            System.out.println(translate(sc.nextInt()));
-//        }
-//        System.out.println("1. Testing \n2. Game\n");
-//        System.out.println("1. Test Dash Call \n2. Test Trump Suit Bid Call\n 3. Test Second Round Bidding\n");
-//        System.out.println("1. Play with users\n 2. Play with computers\n");
-        User u1 = new User("User1");
-        User u2 = new User("User2");
-        User u3 = new User("User3");
-        User u4 = new User("User4");
-//
-        Computer c1 = new Computer("Computer1");
-        Computer c2 = new Computer("Computer2");
-        Computer c3 = new Computer("Computer3");
-        Computer c4 = new Computer("Computer4");
+        System.out.println("\n--------------------------------------------------\nWelcome to Estimation\n");
+        System.out.println("\nPlease choose a number from the following:\n");
+        System.out.println("1. Game \n2. Testing \n3. Exit");
+        String choice = sc.nextLine();
+        Boolean invalid = true;
 
-//        ArrayList<Computer> computers = new ArrayList<>(Arrays.asList(c1, c2, c3, c4));
+        while (invalid) {
+            switch (choice) {
+                case "1":
+                    invalid = false;
+                    playEstimation(sc);
+                    break;
+                case "2":
+                    invalid = false;
+                    testingSuite(sc);
+                    break;
+                case "3":
+                    invalid = false;
+                    break;
+                default:
+                    System.out.println("Please enter a number from 1 to 3\n");
+                    choice = sc.nextLine();
+                    break;
+            }
+        }
+    }
 
-//        testDetermineTrickPaths(computers);
-//        u1.incrementScore(21);
-//        u2.incrementScore(-1);
-//        u3.incrementScore(-1);
-//        u4.incrementScore(20);
-//        ArrayList<Player> players = new ArrayList<>(Arrays.asList(u1, u2, u3, u4));
-//        Estimation.calculatePositions(players);
-        Session s1 = new Session(u1, c2, c3, c4);
-//        players = new ArrayList<>(Arrays.asList(u1, c2, c3, c4));
-//        Session s1 = new Session(u1, u2, u3, u4);
-        s1.startSession();
+    public static void main(String[] args) throws InterruptedException {
+        start();
     }
 
 }
